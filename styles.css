@@ -23,6 +23,12 @@ body {
     color: #555;
   }
   
+  h2 {
+    margin-bottom: 10px;
+    font-size: 1.5rem;
+    color: #555;
+  }
+  
   p {
     font-size: 1.5rem;
     font-style: italic;
@@ -46,5 +52,34 @@ body {
     margin-top: 10px;
     width: 80%;
     box-sizing: border-box;
+  }
+  
+  /* Calendar styling */
+  #calendar-container {
+    margin-top: 30px;
+  }
+  
+  #calendar {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 5px;
+    margin-top: 10px;
+  }
+  
+  .calendar-day {
+    padding: 10px;
+    text-align: center;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 0.9rem;
+    color: #fff;
+  }
+  
+  .solved {
+    background-color: green;
+  }
+  
+  .unsolved {
+    background-color: red;
   }
   
