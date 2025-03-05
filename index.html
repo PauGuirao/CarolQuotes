@@ -3,8 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Daily Riddle</title>
+  <title>ACERTIJAZO</title>
   <link rel="stylesheet" href="styles.css" />
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
 </head>
 <body>
   <!-- Login Container -->
@@ -13,48 +16,67 @@
     <input type="text" id="username-input" placeholder="Enter your username" />
     <button id="login-button">Login</button>
   </div>
-
+  
   <!-- Game Container (hidden until user logs in) -->
   <div id="game-container" class="container" style="display: none;">
-    <div id="user-info">
-      <span id="welcome-message"></span>
-      <button id="logout-button">Logout</button>
-    </div>
-    <h1>Riddle of the Day</h1>
-    <p id="riddle"></p>
-    <button id="show-answer">Show Answer</button>
-    <p id="answer" style="display: none;"></p>
-    
-    <div class="user-solution">
-      <input type="text" id="user-answer" placeholder="Your answer here" />
-      <button id="submit-answer">Submit Answer</button>
-      <p id="result" style="display: none;"></p>
-    </div>
-    
-    <!-- Timer display for the remaining time -->
-    <p id="timer"></p>
-
-    <!-- Calendar container with month navigation -->
-    <div id="calendar-container">
-      <h2>Riddle Calendar</h2>
-      <div id="calendar-controls">
-        <button id="prev-month">Previous Month</button>
-        <span id="calendar-label"></span>
-        <button id="next-month">Next Month</button>
+    <!-- Header Section: Title and Timer Centered; User Info at Top Right -->
+    <header id="main-header">
+      <div id="header-center">
+        <h1>EL ACERTIJAZO</h1>
+        <p id="timer"></p>
       </div>
-      <div id="calendar"></div>
-    </div>
+      <div id="header-right">
+        <span id="welcome-message"></span>
+        <span id="streak-count"></span>
+        <button id="logout-button">Logout</button>
+      </div>
+    </header>
     
-    <!-- Popup modal for warning before showing answer -->
-    <div id="popup" class="popup-overlay" style="display: none;">
-      <div class="popup-content">
-        <p>Warning: Viewing the answer will count as a mistake. Do you want to proceed?</p>
-        <button id="popup-confirm">Yes, show answer</button>
-        <button id="popup-cancel">Cancel</button>
+    <!-- Cards Container -->
+    <div class="cards-container">
+      <!-- Left Column: Riddle Card (without title/timer) -->
+      <div class="left-column">
+        <div class="card riddle-card">
+          <p id="riddle"></p>
+          <div class="user-solution">
+            <input type="text" id="user-answer" placeholder="Your answer here" />
+            <button id="submit-answer">Soluciona</button>
+            <button id="show-answer">Rendirse</button>
+          </div>
+          <!-- Popup Modal -->
+          <div id="popup" class="popup-overlay" style="display: none;">
+            <div class="popup-content">
+              <p>Warning: Viewing the answer will count as a mistake and reset your streak. Do you want to proceed?</p>
+              <button id="popup-confirm">Yes, show answer</button>
+              <button id="popup-cancel">Cancel</button>
+            </div>
+          </div>
+        </div>
+        <div class="card answer-card">
+            <p id="result" style="display: none;"></p>
+            <p id="answer" style="display: none;"></p>
+        </div>
+      </div>
+      
+      <!-- Right Column: Calendar & Leaderboard Cards -->
+      <div class="right-column">
+        <div class="card calendar-card">
+          <h2>Tu Calendario</h2>
+          <div id="calendar-controls">
+            <button id="prev-month">Prev </button>
+            <span id="calendar-label"></span>
+            <button id="next-month">Next </button>
+          </div>
+          <div id="calendar"></div>
+        </div>
+        <div class="card leaderboard-card">
+          <h2>Leaderboard</h2>
+          <ul id="leaderboard"></ul>
+        </div>
       </div>
     </div>
   </div>
-
+  
   <script src="script.js"></script>
 </body>
 </html>

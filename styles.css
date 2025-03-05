@@ -1,84 +1,135 @@
-body {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
+/* Reset defaults */
+* {
+    box-sizing: border-box;
     margin: 0;
+    padding: 0;
+  }
+  
+  /* Body styling */
+  body {
     font-family: Arial, sans-serif;
     background-color: #f5f5f5;
     color: #333;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
   }
   
+  /* Container for login and game screens */
   .container {
-    text-align: center;
+    width: 90%;
+    max-width: 1200px;
+    margin: 20px;
     padding: 20px;
+    background-color: #fff;
     border-radius: 10px;
-    background-color: white;
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
   }
   
-  h1 {
+  /* Header Section */
+  #main-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 10px;
     margin-bottom: 20px;
+  }
+  
+  /* Header center: title and timer */
+  #header-center {
+    text-align: center;
+    flex: 1;
+  }
+  
+  #header-center h1 {
     font-size: 2rem;
     color: #555;
+    margin-bottom: 5px;
   }
   
-  h2 {
-    margin-bottom: 10px;
-    font-size: 1.5rem;
-    color: #555;
+  #header-center p {
+    font-size: 1.2rem;
+    color: #333;
   }
   
-  p {
+  /* Header right: user info and logout */
+  #header-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  #header-right span {
+    font-size: 1rem;
+    color: #333;
+  }
+  
+  /* Cards Container Layout */
+  .cards-container {
+    display: flex;
+    gap: 20px;
+  }
+  
+  /* Left Column: Riddle Card */
+  .left-column {
+    flex: 0 0 600px; /* Fixed width */
+  }
+  
+  /* Right Column: Calendar & Leaderboard stacked */
+  .right-column {
+    flex: 0 0 320px; /* Fixed width */
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  
+  /* Common Card Styling */
+  .card {
+    background-color: #fff;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  }
+  .answer-card{
+    margin-top: 20px;
+  }
+  #answer{
     font-size: 1.5rem;
-    font-style: italic;
-    color: #888;
+  }
+  
+  /* Increase riddle font size (if not set inline) */
+  #riddle {
+    font-size: 1.5rem;
+    text-align: center;
+}
+  
+  /* Input and Button styling */
+  input[type="text"] {
+    width: 100%;
+    padding: 10px;
+    font-size: 1rem;
+    margin-top: 10px;
   }
   
   button {
     padding: 10px 20px;
     font-size: 1rem;
     margin-top: 10px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
     cursor: pointer;
   }
   
-  .user-solution {
-    margin-top: 20px;
+  button:disabled {
+    background-color: #aaa;
+    cursor: not-allowed;
   }
   
-  input[type="text"] {
-    padding: 10px;
-    font-size: 1rem;
-    margin-top: 10px;
-    width: 80%;
-    box-sizing: border-box;
-  }
-  
-  /* Timer styling */
-  #timer {
-    margin-top: 20px;
-    font-size: 1.2rem;
-    color: #333;
-  }
-  
-  /* Calendar styling */
-  #calendar-container {
-    margin-top: 30px;
-  }
-  
-  #calendar-controls {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-bottom: 10px;
-    gap: 10px;
-  }
-  
-  #calendar-label {
-    font-size: 1.2rem;
-    font-weight: bold;
-  }
-  
+  /* Calendar Styling */
   #calendar {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
@@ -103,13 +154,25 @@ body {
     background-color: red;
   }
   
-  /* Future days styling */
   .future {
     background-color: #ccc;
     color: #333;
   }
   
-  /* Popup overlay styling */
+  /* Leaderboard Styling */
+  #leaderboard {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  #leaderboard li {
+    font-size: 1rem;
+    padding: 5px 0;
+    border-bottom: 1px solid #eee;
+  }
+  
+  /* Popup Overlay Styling */
   .popup-overlay {
     position: fixed;
     top: 0;
@@ -120,13 +183,82 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
+    z-index: 1000;
   }
   
-  /* Popup content styling */
   .popup-content {
     background-color: #fff;
     padding: 20px;
     border-radius: 10px;
     text-align: center;
+  }
+  
+  /* Result message styling */
+  #result {
+    font-size: 1.2rem;
+    margin-top: 10px;
+  }
+  
+  /* Responsive Styles */
+  @media (max-width: 768px) {
+    /* Stack the cards vertically */
+    .cards-container {
+      flex-direction: column;
+      align-items: center;
+    }
+    
+    /* Make both columns full width */
+    .left-column,
+    .right-column {
+      flex: 1 1 100%;
+      width: 100%;
+    }
+    
+    /* Adjust header to stack vertically */
+    #main-header {
+      flex-direction: column;
+      align-items: center;
+    }
+    
+    #header-right {
+      margin-top: 10px;
+      justify-content: center;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    /* Adjust container padding on small screens */
+    .container {
+      padding: 10px;
+    }
+    
+    /* Adjust header font sizes */
+    #header-center h1 {
+      font-size: 2rem;
+    }
+    
+    #header-center p {
+      font-size: 1.5rem;
+    }
+    
+    /* Reduce padding in cards */
+    .card {
+      padding: 10px;
+    }
+    
+    /* Adjust input and button sizes */
+    input[type="text"] {
+      padding: 8px;
+      font-size: 0.9rem;
+    }
+    
+    button {
+      padding: 8px 16px;
+      font-size: 0.9rem;
+    }
+    
+    #leaderboard li {
+      font-size: 0.9rem;
+    }
   }
   

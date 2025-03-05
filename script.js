@@ -1,4 +1,19 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // Firebase configuration – replace with your own project config.
+    const firebaseConfig = {
+        apiKey: "AIzaSyDL0DkMeKuCbPSzDA0TT56q3pO1I08rT1k",
+        authDomain: "carolquotes-eff2e.firebaseapp.com",
+        projectId: "carolquotes-eff2e",
+        storageBucket: "carolquotes-eff2e.firebasestorage.app",
+        messagingSenderId: "251432655094",
+        appId: "1:251432655094:web:5f20dd75c907500709b4d7",
+        measurementId: "G-5JNTDYBL7B"
+      };
+  
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+  
     // Global variable to hold the logged-in username.
     let currentUser = localStorage.getItem('currentUser') || null;
   
@@ -6,6 +21,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const loginContainer = document.getElementById('login-container');
     const gameContainer = document.getElementById('game-container');
     const welcomeMessage = document.getElementById('welcome-message');
+    const streakCountElement = document.getElementById('streak-count');
     const loginButton = document.getElementById('login-button');
     const usernameInput = document.getElementById('username-input');
     const logoutButton = document.getElementById('logout-button');
@@ -39,12 +55,55 @@ document.addEventListener('DOMContentLoaded', () => {
       return `${currentUser}_${key}`;
     }
   
+    // Load user data from Firestore.
+    async function loadUserData() {
+      const userDoc = await db.collection('users').doc(currentUser).get();
+      if (userDoc.exists) {
+        return userDoc.data();
+      } else {
+        // Create default data if the user doesn't exist.
+        const defaultData = {
+          mistakeCount: 0,
+          streak: 0,
+          solved: {} // Solved riddles keyed by unique day keys.
+        };
+        await db.collection('users').doc(currentUser).set(defaultData);
+        return defaultData;
+      }
+    }
+  
+    // Update user data in Firestore.
+    async function updateUserData(data) {
+      await db.collection('users').doc(currentUser).update(data);
+    }
+  
+    // Load and display the leaderboard.
+    async function loadLeaderboard() {
+      const leaderboardEl = document.getElementById('leaderboard');
+      leaderboardEl.innerHTML = '';
+      // Query all users ordered by 'streak' descending.
+      const usersSnapshot = await db.collection('users').orderBy('streak', 'desc').get();
+      usersSnapshot.forEach(doc => {
+        const data = doc.data();
+        const username = doc.id; // Using the document ID as username.
+        const streak = data.streak || 0;
+        const li = document.createElement('li');
+        li.innerText = `${username}: ${streak}`;
+        leaderboardEl.appendChild(li);
+      });
+    }
+  
     // Function that initializes and runs the game logic.
-    function showGame() {
+    async function showGame() {
       loginContainer.style.display = 'none';
       gameContainer.style.display = 'block';
-      welcomeMessage.innerText = `Welcome, ${currentUser}!`;
+      welcomeMessage.innerText = `Hola, ${currentUser}!`;
   
+      const userData = await loadUserData();
+      // Display current streak.
+      streakCountElement.innerText = ` | Racha: ${userData.streak || 0}`;
+  
+      await loadLeaderboard();
       // Constants and riddle definitions.
       const allowedYear = 2025; // Only allow viewing months in 2025
       const riddles = [
@@ -93,50 +152,59 @@ document.addEventListener('DOMContentLoaded', () => {
         return text.toLowerCase().replace(/[^\w\s]|_/g, "").trim();
       }
   
-      // If today's riddle is already solved, update the UI.
-      if (localStorage.getItem(solvedKeyToday) === "true") {
+      // If today's riddle is already solved for this user, update the UI.
+      if (userData.solved[solvedKeyToday]) {
         answerElement.innerText = dailyRiddle.answer;
         answerElement.style.display = 'block';
         userAnswerInput.disabled = true;
         submitAnswerButton.disabled = true;
-        resultElement.innerText = "You've already solved today's riddle!";
+        showAnswerButton.disabled = true;
+        resultElement.innerText = "Ya has solucionado el acertijo de hoy.";
         resultElement.style.display = 'block';
       }
   
-      // "Show Answer" button now triggers a custom in-page popup.
+      // "Show Answer" button triggers a custom popup.
       showAnswerButton.addEventListener('click', () => {
         popup.style.display = 'flex';
       });
   
-      // Popup confirm: record a mistake, show the answer, and disable further answering.
-      popupConfirm.addEventListener('click', () => {
-        let mistakes = parseInt(localStorage.getItem(getStorageKey('mistakeCount')) || "0", 10);
-        mistakes++;
-        localStorage.setItem(getStorageKey('mistakeCount'), mistakes);
+      // Popup confirm: record a mistake, reset streak, show the answer, disable further answering.
+      popupConfirm.addEventListener('click', async () => {
+        userData.mistakeCount = (userData.mistakeCount || 0) + 1;
+        // Reset streak on failure.
+        userData.streak = 0;
+        streakCountElement.innerText = ` | Streak: ${userData.streak}`;
         answerElement.innerText = dailyRiddle.answer;
         answerElement.style.display = 'block';
         userAnswerInput.disabled = true;
         submitAnswerButton.disabled = true;
         popup.style.display = 'none';
+        await updateUserData({ mistakeCount: userData.mistakeCount, streak: userData.streak });
+        loadLeaderboard(); // update leaderboard after streak change
       });
   
-      // Popup cancel: simply hide the popup.
+      // Popup cancel: hide the popup.
       popupCancel.addEventListener('click', () => {
         popup.style.display = 'none';
       });
   
       // Submit answer button handler.
-      submitAnswerButton.addEventListener('click', () => {
+      submitAnswerButton.addEventListener('click', async () => {
         const userAnswer = userAnswerInput.value;
         if (normalize(userAnswer) === normalize(dailyRiddle.answer)) {
-          localStorage.setItem(solvedKeyToday, "true");
+          userData.solved[solvedKeyToday] = true;
+          // Increase streak on correct answer.
+          userData.streak = (userData.streak || 0) + 1;
+          streakCountElement.innerText = ` | Racha: ${userData.streak}`;
           resultElement.innerText = "Correct! You solved today's riddle.";
           resultElement.style.display = 'block';
           answerElement.innerText = dailyRiddle.answer;
           answerElement.style.display = 'block';
           userAnswerInput.disabled = true;
           submitAnswerButton.disabled = true;
+          await updateUserData({ solved: userData.solved, streak: userData.streak });
           buildCalendar(currentCalendarMonth, currentCalendarYear); // update calendar
+          loadLeaderboard(); // update leaderboard
         } else {
           resultElement.innerText = "Incorrect answer. Please try again.";
           resultElement.style.display = 'block';
@@ -176,18 +244,17 @@ document.addEventListener('DOMContentLoaded', () => {
   
         const now = new Date();
         const firstDay = new Date(year, month, 1);
-        const lastDay = new Date(year, month + 1, 0); // Last day
+        const lastDay = new Date(year, month + 1, 0);
   
         for (let d = 1; d <= lastDay.getDate(); d++) {
           const currentDate = new Date(year, month, d);
           const dayOfYear = getDayOfYear(currentDate);
           const solvedKeyForDay = getStorageKey(`riddleSolved_${year}_${dayOfYear}`);
-          const solved = localStorage.getItem(solvedKeyForDay) === "true";
+          const solved = userData.solved[solvedKeyForDay];
   
           const dayDiv = document.createElement('div');
           dayDiv.classList.add('calendar-day');
   
-          // If day is in the future relative to today, mark as future.
           if (
             (year > today.getFullYear()) ||
             (year === today.getFullYear() && month > today.getMonth()) ||
@@ -214,8 +281,12 @@ document.addEventListener('DOMContentLoaded', () => {
         const diffMs = tomorrow - now;
         const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
         const diffMinutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
-        document.getElementById('timer').innerText = `Time remaining: ${diffHours} hour(s) and ${diffMinutes} minute(s)`;
+        // Ensure two digits by padding with zeros if necessary
+        const hoursStr = diffHours.toString().padStart(2, '0');
+        const minutesStr = diffMinutes.toString().padStart(2, '0');
+        document.getElementById('timer').innerText = `${hoursStr}:${minutesStr}`;
       }
+      
       
       updateTimer();
       setInterval(updateTimer, 1000);
@@ -233,5 +304,8 @@ document.addEventListener('DOMContentLoaded', () => {
         buildCalendar(currentCalendarMonth, currentCalendarYear);
       });
     } // end showGame()
+  
+    // Optionally, you could refresh the leaderboard periodically.
+    // loadLeaderboard();
   });
   
