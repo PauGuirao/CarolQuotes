@@ -54,6 +54,13 @@ body {
     box-sizing: border-box;
   }
   
+  /* Timer styling */
+  #timer {
+    margin-top: 20px;
+    font-size: 1.2rem;
+    color: #333;
+  }
+  
   /* Calendar styling */
   #calendar-container {
     margin-top: 30px;
@@ -81,5 +88,11 @@ body {
   
   .unsolved {
     background-color: red;
+  }
+  
+  /* Future days styling */
+  .future {
+    background-color: #ccc;
+    color: #333;
   }
   

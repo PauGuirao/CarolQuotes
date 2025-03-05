@@ -83,7 +83,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   
     // Build a simple calendar for the current month.
-    // For each day, it creates a cell colored green if solved or red if unsolved.
+    // Days in the past (or today) are shown as solved (green) or unsolved (red),
+    // while days that haven't occurred yet are marked with a "future" class.
     function buildCalendar() {
       const calendarEl = document.getElementById('calendar');
       calendarEl.innerHTML = ''; // Clear previous calendar entries
@@ -102,7 +103,13 @@ document.addEventListener('DOMContentLoaded', () => {
         
         const dayDiv = document.createElement('div');
         dayDiv.classList.add('calendar-day');
-        dayDiv.classList.add(solved ? 'solved' : 'unsolved');
+  
+        // For days in the future (in the current month), mark as "future"
+        if (currentDate.getDate() > now.getDate()) {
+          dayDiv.classList.add('future');
+        } else {
+          dayDiv.classList.add(solved ? 'solved' : 'unsolved');
+        }
         dayDiv.innerText = d;
         calendarEl.appendChild(dayDiv);
       }
@@ -110,5 +117,20 @@ document.addEventListener('DOMContentLoaded', () => {
   
     // Build the calendar when the page loads
     buildCalendar();
+  
+    // Timer to display the remaining time until midnight
+    function updateTimer() {
+      const now = new Date();
+      // Next midnight
+      const tomorrow = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+      const diffMs = tomorrow - now;
+      const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+      const diffMinutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+      document.getElementById('timer').innerText = `Time remaining: ${diffHours} hour(s) and ${diffMinutes} minute(s)`;
+    }
+    
+    // Initial call and update timer every second
+    updateTimer();
+    setInterval(updateTimer, 1000);
   });
   
