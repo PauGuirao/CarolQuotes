@@ -108,22 +108,83 @@ document.addEventListener('DOMContentLoaded', () => {
       const allowedYear = 2025; // Only allow viewing months in 2025
       const riddles = [
         {
-          riddle: "What has keys but can't open locks?",
-          answer: "A piano."
+          riddle: "¿Qué tiene llaves pero no puede abrir cerraduras?",
+          answer: "Un piano."
         },
         {
-          riddle: "What has a head and a tail but no body?",
-          answer: "A coin."
+          riddle: "¿Qué se moja mientras seca?",
+          answer: "Una toalla."
         },
         {
-          riddle: "What gets wetter as it dries?",
-          answer: "A towel."
+          riddle: "Sin boca hablo, sin oídos oigo, sin cuerpo existo, pero con el viento cobro vida. ¿Qué soy?",
+          answer: "Un eco."
         },
         {
-          riddle: "I speak without a mouth and hear without ears. I have no body, but I come alive with wind. What am I?",
-          answer: "An echo."
+          riddle: "¿Qué cosa, cuanto más le quitas, más grande se vuelve?",
+          answer: "Un agujero."
+        },
+        {
+          riddle: "¿Qué sube y baja pero no se mueve?",
+          answer: "Las escaleras."
+        },
+        {
+          riddle: "¿Qué tiene un ojo pero no puede ver?",
+          answer: "Una aguja."
+        },
+        {
+          riddle: "¿Qué pesa más, un kilo de plumas o un kilo de plomo?",
+          answer: "Pesan lo mismo."
+        },
+        {
+          riddle: "¿Qué corre pero nunca camina?",
+          answer: "El agua."
+        },
+        {
+          riddle: "¿Quien es la futura mujer del Pau?",
+          answer: "Carol"
+        },
+        {
+          riddle: "¿Qué se rompe sin ser tocado?",
+          answer: "El silencio."
+        },
+        {
+          riddle: "¿Qué tiene 4 patas en la mañana, 2 patas al mediodía y 3 patas en la noche?",
+          answer: "El hombre."
+        },
+        {
+          riddle: "¿Qué tiene ciudades, pero no casas; montañas, pero no árboles; y agua, pero no peces?",
+          answer: "Un mapa."
+        },
+        {
+          riddle: "¿Qué puede llenar una habitación pero no ocupa espacio?",
+          answer: "La luz."
+        },
+        {
+          riddle: "¿Qué tiene agujeros por todas partes y aún puede retener agua?",
+          answer: "Una esponja."
+        },
+        {
+          riddle: "¿Qué se va y nunca regresa?",
+          answer: "El tiempo."
+        },
+        {
+          riddle: "¿Qué es lo que siempre viene pero nunca llega?",
+          answer: "El mañana."
+        },
+        {
+          riddle: "¿Qué tiene orejas pero no oye?",
+          answer: "El maíz."
+        },
+        {
+          riddle: "¿Qué va por el agua y no se moja?",
+          answer: "La sombra."
+        },
+        {
+          riddle: "¿Qué se abre y nunca cierra?",
+          answer: "Una herida."
         }
       ];
+      
   
       // DOM elements for the game.
       const riddleElement = document.getElementById('riddle');
@@ -145,6 +206,7 @@ document.addEventListener('DOMContentLoaded', () => {
   
       // Select today's riddle (same for all users).
       const dailyRiddle = riddles[dayOfYearToday % riddles.length];
+
       riddleElement.innerText = dailyRiddle.riddle;
   
       // Normalize function (ignores punctuation and case).
@@ -159,7 +221,7 @@ document.addEventListener('DOMContentLoaded', () => {
         userAnswerInput.disabled = true;
         submitAnswerButton.disabled = true;
         showAnswerButton.disabled = true;
-        resultElement.innerText = "Ya has solucionado el acertijo de hoy.";
+        resultElement.innerText = "Ya has solucionado el acertijo de hoy, vuelve mañana!";
         resultElement.style.display = 'block';
       }
   
