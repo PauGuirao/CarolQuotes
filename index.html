@@ -22,9 +22,24 @@
     <!-- Timer display for the remaining time -->
     <p id="timer"></p>
 
+    <!-- Calendar container with month navigation -->
     <div id="calendar-container">
       <h2>Riddle Calendar</h2>
+      <div id="calendar-controls">
+        <button id="prev-month">Previous Month</button>
+        <span id="calendar-label"></span>
+        <button id="next-month">Next Month</button>
+      </div>
       <div id="calendar"></div>
+    </div>
+    
+    <!-- Popup modal for warning before showing answer -->
+    <div id="popup" class="popup-overlay" style="display: none;">
+      <div class="popup-content">
+        <p>Warning: Viewing the answer will count as a mistake. Do you want to proceed?</p>
+        <button id="popup-confirm">Yes, show answer</button>
+        <button id="popup-cancel">Cancel</button>
+      </div>
     </div>
   </div>
 
