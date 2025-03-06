@@ -1,264 +1,512 @@
 /* Reset defaults */
 * {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* Body styling */
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f5f5f5;
+  color: #333;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
+
+/* Container for login and game screens */
+.container {
+  width: 90%;
+  max-width: 1200px;
+  margin: 20px;
+  padding: 20px;
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+.main-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  gap: 20px;
+}
+/* Navbar principal */
+#main-navbar {
+  background-color: #007bff;
+  padding: 10px 20px;
+  text-align: center;
+}
+
+/* Botones del navbar en fila centrada */
+#main-navbar ul {
+  list-style: none;
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  padding: 0;
+  margin: 0;
+}
+
+/* Estilos para el título del navbar */
+.navbar-title {
+  color: white;
+  font-size: 2rem;
+  font-weight: bold;
+  margin-bottom: 10px;
+  display: block;
+}
+/* Ajuste responsivo para pantallas pequeñas */
+@media (max-width: 600px) {
+  .navbar-title {
+    font-size: 1.5rem;
   }
-  
-  /* Body styling */
-  body {
-    font-family: Arial, sans-serif;
-    background-color: #f5f5f5;
-    color: #333;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-  }
-  
-  /* Container for login and game screens */
-  .container {
-    width: 90%;
-    max-width: 1200px;
-    margin: 20px;
-    padding: 20px;
-    background-color: #fff;
-    border-radius: 10px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-  }
-  
-  /* Header Section */
-  #main-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 1px solid #ddd;
-    padding-bottom: 10px;
-    margin-bottom: 20px;
-  }
-  
-  /* Header center: title and timer */
-  #header-center {
-    text-align: center;
-    flex: 1;
-  }
-  
-  #header-center h1 {
-    font-size: 2rem;
-    color: #555;
-    margin-bottom: 5px;
-  }
-  
-  #header-center p {
-    font-size: 1.2rem;
-    color: #333;
-  }
-  
-  /* Header right: user info and logout */
-  #header-right {
-    display: flex;
-    align-items: center;
+  #main-navbar ul {
+    flex-direction: row;
     gap: 10px;
   }
-  
-  #header-right span {
-    font-size: 1rem;
-    color: #333;
-  }
-  
-  /* Cards Container Layout */
-  .cards-container {
-    display: flex;
-    gap: 20px;
-  }
-  
-  /* Left Column: Riddle Card */
-  .left-column {
-    flex: 0 0 600px; /* Fixed width */
-  }
-  
-  /* Right Column: Calendar & Leaderboard stacked */
-  .right-column {
-    flex: 0 0 320px; /* Fixed width */
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-  }
-  
-  /* Common Card Styling */
-  .card {
-    background-color: #fff;
-    border-radius: 10px;
-    padding: 20px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-  }
-  .answer-card{
-    margin-top: 20px;
-  }
-  #answer{
-    font-size: 1.5rem;
-  }
-  
-  /* Increase riddle font size (if not set inline) */
-  #riddle {
-    font-size: 1.5rem;
-    text-align: center;
 }
-  
-  /* Input and Button styling */
-  input[type="text"] {
-    width: 100%;
-    padding: 10px;
-    font-size: 1rem;
-    margin-top: 10px;
+
+#main-navbar li a {
+  color: #fff;
+  text-decoration: none;
+  font-size: 1.1rem;
+  padding: 5px 10px;
+  border-radius: 5px;
+  transition: background-color 0.3s;
+}
+
+#main-navbar li a:hover {
+  background-color: #0056b3;
+}
+
+/* Header Section */
+#main-header {
+  margin-top: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 10px;
+  margin-bottom: 20px;
+}
+
+/* Header center: title and timer */
+#header-center {
+  text-align: center;
+  flex: 1;
+}
+
+#header-center h1 {
+  font-size: 2rem;
+  color: #555;
+  margin-bottom: 5px;
+}
+
+#header-center p {
+  font-size: 1.2rem;
+  color: #333;
+}
+#timer {
+  font-size: 1.5rem;
+  color: #242424;
+  background-color: #f1f1f1;
+  padding: 5px 10px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  margin-top: 10px;
+  margin-bottom: 10px;
+  display: inline-block;
+}
+
+/* Header right: user info and logout */
+#header-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+#logout-button {
+  margin-top: 0px;
+}
+
+#header-right span {
+  font-size: 1rem;
+  color: #333;
+}
+
+/* Cards Container Layout */
+.cards-container {
+  display: flex;
+  gap: 20px;
+}
+
+/* Left Column: Riddle Card */
+.left-column {
+  flex: 0 0 600px; /* Fixed width */
+}
+
+/* Right Column: Calendar & Leaderboard stacked */
+.right-column {
+  flex: 0 0 320px; /* Fixed width */
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Common Card Styling */
+.card {
+  background-color: #fff;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+.answer-card {
+  padding: 20px;
+  border-radius: 10px;
+  margin-top: 0px;
+  margin-bottom: 20px;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  text-align: center;
+  display: none; /* Mantenerlo oculto inicialmente */
+}
+/* Animación de aparición */
+.answer-card.show {
+  display: block;
+  animation: fadeIn 0.5s ease forwards;
+}
+/* Mensaje de éxito */
+.result-message.success {
+  color: #28a745; /* Verde */
+  font-size: 1.8rem;
+  margin-bottom: 10px;
+  font-weight: bold;
+}
+
+/* Mensaje de error */
+.result-message.fail {
+  color: #dc3545; /* Rojo */
+  font-size: 1.8rem;
+  margin-bottom: 10px;
+  font-weight: bold;
+}
+
+/* Mensaje de respuesta */
+.answer-message {
+  color: #555;
+  font-size: 1.5rem;
+  background-color: #f1f1f1;
+  padding: 10px;
+  border-radius: 8px;
+  margin-top: 10px;
+  border-left: 5px solid #007bff;
+}
+
+/* Efecto de aparición */
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
   }
-  
-  button {
-    padding: 10px 20px;
-    font-size: 1rem;
-    margin-top: 10px;
-    background-color: #007bff;
-    color: #fff;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
+  100% {
+    opacity: 1;
+    transform: translateY(0);
   }
-  
-  button:disabled {
-    background-color: #aaa;
-    cursor: not-allowed;
+}
+#answer {
+  font-size: 1.5rem;
+}
+
+/* Increase riddle font size (if not set inline) */
+#riddle {
+  font-size: 1.5rem;
+  text-align: center;
+}
+.riddle-card {
+  padding-top: 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+/* Input and Button styling */
+input[type="text"] {
+  width: 100%;
+  padding: 10px;
+  font-size: 1rem;
+  margin-top: 10px;
+}
+
+button {
+  padding: 10px 20px;
+  font-size: 1rem;
+  margin-top: 10px;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+/* Estilo para los botones desactivados */
+button:disabled {
+  background-color: #ddd;
+  color: #999;
+  cursor: not-allowed;
+  border: 1px solid #ccc;
+  opacity: 0.7;
+  transition: all 0.3s ease;
+}
+
+/* Suaviza la transición de los botones */
+button {
+  transition: all 0.3s ease;
+}
+
+/* Opcional: Efecto de "botón apagado" */
+button:disabled:hover {
+  transform: none; /* Evita el efecto hover */
+  box-shadow: none;
+}
+
+/* Calendar Styling */
+#calendar {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 5px;
+  margin-top: 10px;
+}
+.calendar-card {
+  justify-content: center;
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+}
+
+.calendar-day {
+  padding: 10px;
+  text-align: center;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 0.9rem;
+  color: #fff;
+}
+
+.solved {
+  background-color: green;
+}
+
+.unsolved {
+  background-color: red;
+}
+
+.future {
+  background-color: #ccc;
+  color: #333;
+}
+
+/* Leaderboard Styling */
+#leaderboard {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+#leaderboard li {
+  font-size: 1rem;
+  padding: 5px 0;
+  border-bottom: 1px solid #eee;
+}
+
+/* Popup Overlay Styling */
+.popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.popup-content {
+  background-color: #fff;
+  padding: 30px;
+  border-radius: 15px;
+  max-width: 400px;
+  width: 90%;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+  text-align: center;
+  position: relative;
+  animation: popup-appear 0.3s ease;
+}
+/* Título del popup */
+.popup-title {
+  font-size: 1.8rem;
+  color: #333;
+  margin-bottom: 10px;
+  font-weight: bold;
+}
+
+/* Mensaje del popup */
+.popup-message {
+  font-size: 1.2rem;
+  color: #555;
+  margin-bottom: 20px;
+  line-height: 1.4;
+}
+
+/* Botones del popup */
+.popup-buttons {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 20px;
+}
+
+.popup-btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.popup-btn.confirm {
+  background-color: #007bff;
+  color: white;
+}
+
+.popup-btn.cancel {
+  background-color: #ddd;
+  color: #333;
+}
+
+/* Efecto de hover */
+.popup-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Efecto de animación */
+@keyframes popup-appear {
+  0% {
+    transform: scale(0.7);
+    opacity: 0;
   }
-  
-  /* Calendar Styling */
-  #calendar {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    gap: 5px;
-    margin-top: 10px;
+  100% {
+    transform: scale(1);
+    opacity: 1;
   }
-  
-  .calendar-day {
-    padding: 10px;
-    text-align: center;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    font-size: 0.9rem;
-    color: #fff;
-  }
-  
-  .solved {
-    background-color: green;
-  }
-  
-  .unsolved {
-    background-color: red;
-  }
-  
-  .future {
-    background-color: #ccc;
-    color: #333;
-  }
-  
-  /* Leaderboard Styling */
-  #leaderboard {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-  }
-  
-  #leaderboard li {
-    font-size: 1rem;
-    padding: 5px 0;
-    border-bottom: 1px solid #eee;
-  }
-  
-  /* Popup Overlay Styling */
-  .popup-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0,0,0,0.5);
-    display: flex;
-    justify-content: center;
+}
+
+/* Result message styling */
+#result {
+  font-size: 1.2rem;
+  margin-top: 10px;
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+  /* Stack the cards vertically */
+  .cards-container {
+    flex-direction: column;
     align-items: center;
-    z-index: 1000;
+    padding: 10px;
   }
-  
-  .popup-content {
-    background-color: #fff;
-    padding: 20px;
-    border-radius: 10px;
-    text-align: center;
+
+  /* Make both columns full width */
+  .left-column,
+  .right-column {
+    flex: 1 1 100%;
+    width: 100%;
   }
-  
-  /* Result message styling */
-  #result {
-    font-size: 1.2rem;
+
+  /* Adjust header to stack vertically */
+  #main-header {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  #header-right {
     margin-top: 10px;
+    justify-content: center;
   }
-  
-  /* Responsive Styles */
-  @media (max-width: 768px) {
-    /* Stack the cards vertically */
-    .cards-container {
-      flex-direction: column;
-      align-items: center;
-    }
-    
-    /* Make both columns full width */
-    .left-column,
-    .right-column {
-      flex: 1 1 100%;
-      width: 100%;
-    }
-    
-    /* Adjust header to stack vertically */
-    #main-header {
-      flex-direction: column;
-      align-items: center;
-    }
-    
-    #header-right {
-      margin-top: 10px;
-      justify-content: center;
-    }
+}
+
+@media (max-width: 480px) {
+  /* Adjust container padding on small screens */
+  .container {
+    padding: 10px;
   }
-  
-  @media (max-width: 480px) {
-    /* Adjust container padding on small screens */
-    .container {
-      padding: 10px;
-    }
-    
-    /* Adjust header font sizes */
-    #header-center h1 {
-      font-size: 2rem;
-    }
-    
-    #header-center p {
-      font-size: 1.5rem;
-    }
-    
-    /* Reduce padding in cards */
-    .card {
-      padding: 10px;
-    }
-    
-    /* Adjust input and button sizes */
-    input[type="text"] {
-      padding: 8px;
-      font-size: 0.9rem;
-    }
-    
-    button {
-      padding: 8px 16px;
-      font-size: 0.9rem;
-    }
-    
-    #leaderboard li {
-      font-size: 0.9rem;
-    }
+
+  /* Adjust header font sizes */
+  #header-center h1 {
+    font-size: 2rem;
   }
-  
+
+  #header-center p {
+    font-size: 1.5rem;
+  }
+
+  /* Reduce padding in cards */
+  .card {
+    padding: 10px;
+  }
+
+  /* Adjust input and button sizes */
+  input[type="text"] {
+    padding: 8px;
+    font-size: 0.9rem;
+  }
+
+  button {
+    padding: 8px 16px;
+    font-size: 0.9rem;
+  }
+
+  #leaderboard li {
+    font-size: 0.9rem;
+  }
+}
+
+.user-solution {
+  width: 90%;
+}
+
+.buttons-riddle {
+  justify-content: center;
+  display: flex;
+}
+#submit-answer {
+  background-color: #3db54d;
+}
+#show-answer {
+  background-color: #f44336;
+}
+.submit {
+  margin: 20px;
+  font-size: 20px;
+}
+
+#streak-count i {
+  color: #e6790c; /* CarolCoins en dorado */
+  font-size: 1.7rem;
+}
+#carolCoins i {
+  color: #ffd700; /* CarolCoins en dorado */
+  font-size: 1.7rem;
+}
+.points-card {
+  justify-content: center;
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+}

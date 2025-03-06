@@ -1,82 +1,163 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ACERTIJAZO</title>
-  <link rel="stylesheet" href="styles.css" />
-  <!-- Firebase SDKs -->
-  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
-</head>
-<body>
-  <!-- Login Container -->
-  <div id="login-container" class="container">
-    <h2>Login</h2>
-    <input type="text" id="username-input" placeholder="Enter your username" />
-    <button id="login-button">Login</button>
-  </div>
-  
-  <!-- Game Container (hidden until user logs in) -->
-  <div id="game-container" class="container" style="display: none;">
-    <!-- Header Section: Title and Timer Centered; User Info at Top Right -->
-    <header id="main-header">
-      <div id="header-center">
-        <h1>EL ACERTIJAZO</h1>
-        <p id="timer"></p>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ACERTIJAZO</title>
+    <link rel="stylesheet" href="styles.css" />
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+    <!-- Agrega Font Awesome desde CDN -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
+  </head>
+  <body>
+    <!-- Navbar Global, siempre visible en la parte superior -->
+    <nav id="main-navbar">
+      <span class="navbar-title">ACERTIJAZOS</span>
+      <ul>
+        <li>
+          <a href="#" id="nav-home" title="Inicio"
+            ><i class="fas fa-home"></i
+          ></a>
+        </li>
+        <li>
+          <a href="#" id="nav-calendar" title="Calendario"
+            ><i class="fas fa-calendar-alt"></i
+          ></a>
+        </li>
+        <li>
+          <a href="#" id="nav-leaderboard" title="Leaderboard"
+            ><i class="fas fa-trophy"></i
+          ></a>
+        </li>
+      </ul>
+    </nav>
+
+    <main class="main-container">
+      <!-- Login Container -->
+      <div id="login-container" class="" style="text-align: center">
+        <p style="font-size: 1rem; margin-bottom: 5px">Bienvenido al</p>
+        <h1 style="font-size: 3rem; margin-bottom: 20px">ACERTIJAZO</h1>
+        <div class="container">
+          <h2>Login</h2>
+          <input
+            type="text"
+            id="username-input"
+            placeholder="Ingresa tu usuario"
+          />
+          <button id="login-button">Entra</button>
+          <div id="login-error" style="color: red; margin-top: 10px"></div>
+        </div>
       </div>
-      <div id="header-right">
-        <span id="welcome-message"></span>
-        <span id="streak-count"></span>
-        <button id="logout-button">Logout</button>
-      </div>
-    </header>
-    
-    <!-- Cards Container -->
-    <div class="cards-container">
-      <!-- Left Column: Riddle Card (without title/timer) -->
-      <div class="left-column">
-        <div class="card riddle-card">
-          <p id="riddle"></p>
-          <div class="user-solution">
-            <input type="text" id="user-answer" placeholder="Your answer here" />
-            <button id="submit-answer">Soluciona</button>
-            <button id="show-answer">Rendirse</button>
+
+      <!-- Game Container (hidden until user logs in) -->
+      <div id="game-container" class="" style="display: none">
+        <!-- Header Section: Title and Timer Centered; User Info at Top Right -->
+        <header id="main-header">
+          <div id="header-center" style="display: none">
+            <h1>EL ACERTIJAZO</h1>
           </div>
-          <!-- Popup Modal -->
-          <div id="popup" class="popup-overlay" style="display: none;">
-            <div class="popup-content">
-              <p>Warning: Viewing the answer will count as a mistake and reset your streak. Do you want to proceed?</p>
-              <button id="popup-confirm">Yes, show answer</button>
-              <button id="popup-cancel">Cancel</button>
+          <div id="header-right">
+            <span id="welcome-message"></span>
+            <button id="logout-button">Logout</button>
+          </div>
+        </header>
+
+        <!-- Cards Container -->
+        <div class="cards-container">
+          <!-- Left Column: Riddle Card (without title/timer) -->
+          <div class="left-column">
+            <div class="card answer-card" id="answer-card">
+              <p id="timer"></p>
+              <p id="result" class="result-message"></p>
+              <p id="answer" class="answer-message"></p>
+            </div>
+            <div class="card riddle-card">
+              <p id="riddle"></p>
+              <div class="user-solution">
+                <input
+                  type="text"
+                  id="user-answer"
+                  placeholder="Tu respuesta"
+                />
+                <div class="buttons-riddle">
+                  <button id="submit-answer" class="submit">Soluciona</button>
+                  <button id="show-answer" class="submit">Rendirse</button>
+                </div>
+              </div>
+              <!-- Popup Modal -->
+              <div id="popup" class="popup-overlay" style="display: none">
+                <div class="popup-content">
+                  <h2 class="popup-title">¿Estás seguro?</h2>
+                  <p class="popup-message">
+                    ⚠️ Ver la respuesta contará como un error y reiniciará tu
+                    racha. ¿Deseas continuar?
+                  </p>
+                  <div class="popup-buttons">
+                    <button id="popup-confirm" class="popup-btn confirm">
+                      Sí, mostrar respuesta
+                    </button>
+                    <button id="popup-cancel" class="popup-btn cancel">
+                      Cancelar
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right Column: Calendar & Leaderboard Cards -->
+          <div class="right-column">
+            <div class="card points-card">
+              <h3>Tus puntos</h3>
+              <div>
+                <span id="streak-count" style="margin-right: 10px">
+                  <i class="fas fa-fire"></i> <span id="streak-value">0</span>
+                </span>
+                <span id="carolCoins">
+                  <i class="fas fa-coins"></i> <span id="coins-value">0</span>
+                </span>
+              </div>
+            </div>
+            <div class="card calendar-card">
+              <h3>Tus Acetijazos</h3>
+              <div id="calendar-controls">
+                <button id="prev-month">Prev</button>
+                <span id="calendar-label"></span>
+                <button id="next-month">Next</button>
+              </div>
+              <div id="calendar"></div>
+            </div>
+            <div class="card leaderboard-card">
+              <h3>Tus rivales</h3>
+              <ul id="leaderboard"></ul>
             </div>
           </div>
         </div>
-        <div class="card answer-card">
-            <p id="result" style="display: none;"></p>
-            <p id="answer" style="display: none;"></p>
-        </div>
-      </div>
-      
-      <!-- Right Column: Calendar & Leaderboard Cards -->
-      <div class="right-column">
-        <div class="card calendar-card">
-          <h2>Tu Calendario</h2>
-          <div id="calendar-controls">
-            <button id="prev-month">Prev </button>
-            <span id="calendar-label"></span>
-            <button id="next-month">Next </button>
+        <div id="calendar-popup" class="popup-overlay" style="display: none">
+          <div class="popup-content">
+            <h3 id="calendar-popup-title"></h3>
+            <p id="calendar-popup-question"></p>
+            <p id="calendar-popup-answer"></p>
+            <button id="calendar-popup-close">Cerrar</button>
           </div>
-          <div id="calendar"></div>
         </div>
-        <div class="card leaderboard-card">
-          <h2>Las Rachas!</h2>
-          <ul id="leaderboard"></ul>
+        <!-- Popup Modal de Éxito -->
+        <div id="success-popup" class="popup-overlay" style="display: none">
+          <div class="popup-content success">
+            <h2 class="popup-title">¡Felicidades! 🎉</h2>
+            <p id="success-message" class="popup-message"></p>
+            <button id="success-popup-close" class="popup-btn confirm">
+              Cerrar
+            </button>
+          </div>
         </div>
       </div>
-    </div>
-  </div>
-  
-  <script src="script.js"></script>
-</body>
+    </main>
+    <script src="script.js"></script>
+  </body>
 </html>

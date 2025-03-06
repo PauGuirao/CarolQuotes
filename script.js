@@ -22,21 +22,33 @@ document.addEventListener('DOMContentLoaded', () => {
     const gameContainer = document.getElementById('game-container');
     const welcomeMessage = document.getElementById('welcome-message');
     const streakCountElement = document.getElementById('streak-count');
+    const carolCoinsElement = document.getElementById('carolCoins');
     const loginButton = document.getElementById('login-button');
     const usernameInput = document.getElementById('username-input');
     const logoutButton = document.getElementById('logout-button');
+const answerCard = document.getElementById('answer-card');
   
     // Login event handler.
-    loginButton.addEventListener('click', () => {
-      const username = usernameInput.value.trim();
-      if (username) {
-        currentUser = username;
-        localStorage.setItem('currentUser', currentUser);
-        showGame();
-      } else {
-        alert("Please enter a valid username.");
-      }
-    });
+    loginButton.addEventListener('click', async () => {
+        const username = usernameInput.value.trim();
+        const errorMsg = document.getElementById('login-error');
+        errorMsg.innerText = ""; // Limpia el mensaje de error anterior
+      
+        if (username) {
+          const userDoc = await db.collection('users').doc(username).get();
+          if (userDoc.exists) {
+            currentUser = username;
+            localStorage.setItem('currentUser', currentUser);
+            showGame();
+          } else {
+            errorMsg.innerText = "El usuario no existe. Por favor, ingresa un usuario válido.";
+          }
+        } else {
+          errorMsg.innerText = "Por favor, introduce un usuario.";
+        }
+      });
+      
+      
   
     // Logout event handler.
     logoutButton.addEventListener('click', () => {
@@ -57,20 +69,21 @@ document.addEventListener('DOMContentLoaded', () => {
   
     // Load user data from Firestore.
     async function loadUserData() {
-      const userDoc = await db.collection('users').doc(currentUser).get();
-      if (userDoc.exists) {
-        return userDoc.data();
-      } else {
-        // Create default data if the user doesn't exist.
-        const defaultData = {
-          mistakeCount: 0,
-          streak: 0,
-          solved: {} // Solved riddles keyed by unique day keys.
-        };
-        await db.collection('users').doc(currentUser).set(defaultData);
-        return defaultData;
+        const userDoc = await db.collection('users').doc(currentUser).get();
+        if (userDoc.exists) {
+          return userDoc.data();
+        } else {
+          // Crear datos por defecto, incluyendo carolCoins
+          const defaultData = {
+            mistakeCount: 0,
+            streak: 0,
+            solved: {},
+            carolCoins: 0
+          };
+          await db.collection('users').doc(currentUser).set(defaultData);
+          return defaultData;
+        }
       }
-    }
   
     // Update user data in Firestore.
     async function updateUserData(data) {
@@ -101,7 +114,10 @@ document.addEventListener('DOMContentLoaded', () => {
   
       const userData = await loadUserData();
       // Display current streak.
-      streakCountElement.innerText = ` | Racha: ${userData.streak || 0}`;
+      // Actualiza la interfaz con íconos y valores de racha y CarolCoins
+      streakCountElement.innerHTML = `RACHA: ${userData.streak || 0} <i class="fas fa-fire"></i>`;
+      carolCoinsElement.innerHTML = `CAROLOS: ${userData.carolCoins || 0} <i class="fas fa-coins"></i>`;
+
   
       await loadLeaderboard();
       // Constants and riddle definitions.
@@ -216,12 +232,13 @@ document.addEventListener('DOMContentLoaded', () => {
   
       // If today's riddle is already solved for this user, update the UI.
       if (userData.solved[solvedKeyToday]) {
+        answerCard.classList.add('show');
         answerElement.innerText = dailyRiddle.answer;
         answerElement.style.display = 'block';
         userAnswerInput.disabled = true;
         submitAnswerButton.disabled = true;
         showAnswerButton.disabled = true;
-        resultElement.innerText = "Ya has solucionado el acertijo de hoy, vuelve mañana!";
+        resultElement.innerText = "Ya has solucionado el acertijo de hoy, vuelve mañana! Era:";
         resultElement.style.display = 'block';
       }
   
@@ -235,7 +252,8 @@ document.addEventListener('DOMContentLoaded', () => {
         userData.mistakeCount = (userData.mistakeCount || 0) + 1;
         // Reset streak on failure.
         userData.streak = 0;
-        streakCountElement.innerText = ` | Streak: ${userData.streak}`;
+        streakCountElement.innerHTML = `RACHA: ${userData.streak || 0} <i class="fas fa-fire"></i>`;
+      carolCoinsElement.innerHTML = `CAROLOS: ${userData.carolCoins || 0} <i class="fas fa-coins"></i>`;
         answerElement.innerText = dailyRiddle.answer;
         answerElement.style.display = 'block';
         userAnswerInput.disabled = true;
@@ -253,25 +271,46 @@ document.addEventListener('DOMContentLoaded', () => {
       // Submit answer button handler.
       submitAnswerButton.addEventListener('click', async () => {
         const userAnswer = userAnswerInput.value;
+        answerCard.classList.add('show'); // Muestra la tarjeta con animación
+
         if (normalize(userAnswer) === normalize(dailyRiddle.answer)) {
           userData.solved[solvedKeyToday] = true;
-          // Increase streak on correct answer.
+          // Incrementar racha y sumar 10 CarolCoins
           userData.streak = (userData.streak || 0) + 1;
-          streakCountElement.innerText = ` | Racha: ${userData.streak}`;
-          resultElement.innerText = "Correct! You solved today's riddle.";
-          resultElement.style.display = 'block';
-          answerElement.innerText = dailyRiddle.answer;
+          userData.carolCoins = (userData.carolCoins || 0) + 10;
+          
+          streakCountElement.innerHTML = `RACHA: ${userData.streak || 0} <i class="fas fa-fire"></i>`;
+      carolCoinsElement.innerHTML = `CAROLOS: ${userData.carolCoins || 0} <i class="fas fa-coins"></i>`;
+          
+            resultElement.className = 'result-message success';
+            resultElement.innerText = "Has acertado el acertijo hoy! Era:";
+            answerElement.innerText = `Respuesta: ${dailyRiddle.answer}`;
+
           answerElement.style.display = 'block';
           userAnswerInput.disabled = true;
           submitAnswerButton.disabled = true;
-          await updateUserData({ solved: userData.solved, streak: userData.streak });
-          buildCalendar(currentCalendarMonth, currentCalendarYear); // update calendar
-          loadLeaderboard(); // update leaderboard
+          showAnswerButton.disabled = true;
+          
+          await updateUserData({ solved: userData.solved, streak: userData.streak, carolCoins: userData.carolCoins });
+          buildCalendar(currentCalendarMonth, currentCalendarYear); // Actualiza el calendario
+          loadLeaderboard(); // Actualiza el leaderboard
+      
+          // Mostrar popup de éxito
+          const successPopup = document.getElementById('success-popup');
+          const successMessage = document.getElementById('success-message');
+          successMessage.innerText = `¡Felicidades, has acertado! Has ganado +10 CarolCoins. La respuesta correcta es: ${dailyRiddle.answer}`;
+          successPopup.style.display = 'flex';
         } else {
-          resultElement.innerText = "Incorrect answer. Please try again.";
-          resultElement.style.display = 'block';
+            resultElement.className = 'result-message fail';
+            resultElement.innerText = "Respuesta incorrecta. Inténtalo de nuevo mañana!";
+            answerElement.innerText = `La respuesta correcta era: ${dailyRiddle.answer}`;
         }
+        // Muestra los elementos de respuesta
+        answerElement.style.display = 'block';
+        resultElement.style.display = 'block';
       });
+      
+      
   
       // Utility: compute day of year for any date.
       function getDayOfYear(date) {
@@ -302,29 +341,55 @@ document.addEventListener('DOMContentLoaded', () => {
       // Build the calendar for a given month and year.
       function buildCalendar(month, year) {
         const calendarEl = document.getElementById('calendar');
-        calendarEl.innerHTML = ''; // Clear previous entries
-  
+        calendarEl.innerHTML = ''; // Limpiar entradas previas
+      
         const now = new Date();
+        // Obtén la fecha de hoy a medianoche para comparar solo la parte de la fecha
+        const todayMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate());
         const firstDay = new Date(year, month, 1);
         const lastDay = new Date(year, month + 1, 0);
-  
+      
         for (let d = 1; d <= lastDay.getDate(); d++) {
           const currentDate = new Date(year, month, d);
           const dayOfYear = getDayOfYear(currentDate);
           const solvedKeyForDay = getStorageKey(`riddleSolved_${year}_${dayOfYear}`);
           const solved = userData.solved[solvedKeyForDay];
-  
+      
           const dayDiv = document.createElement('div');
           dayDiv.classList.add('calendar-day');
-  
-          if (
-            (year > today.getFullYear()) ||
-            (year === today.getFullYear() && month > today.getMonth()) ||
-            (year === today.getFullYear() && month === today.getMonth() && d > today.getDate())
-          ) {
+      
+          // Determina si el día es futuro comparándolo con todayMidnight
+          if (currentDate > todayMidnight) {
             dayDiv.classList.add('future');
           } else {
             dayDiv.classList.add(solved ? 'solved' : 'unsolved');
+            // Solo se añade el listener si el día ya pasó o es el actual
+            dayDiv.addEventListener('click', async () => {
+              // Creamos un ID de documento para el día, por ejemplo "2025_150"
+              const clickedDate = new Date(year, month, d);
+              const dayOfYearClicked = getDayOfYear(clickedDate);
+              const docId = `${year}_${dayOfYearClicked}`;
+              const docRef = db.collection('dailyRiddles').doc(docId);
+              let docSnap = await docRef.get();
+              let data;
+              if (!docSnap.exists) {
+                // Si no existe, obtenemos el acertijo de nuestro arreglo (repetido cíclicamente)
+                const index = dayOfYearClicked % riddles.length;
+                data = {
+                  riddle: riddles[index].riddle,
+                  answer: riddles[index].answer,
+                  date: clickedDate.toISOString()
+                };
+                await docRef.set(data);
+              } else {
+                data = docSnap.data();
+              }
+              // Mostrar el popup del calendario con la información
+              document.getElementById('calendar-popup-title').innerText = `Acertijo del día ${d}/${month + 1}/${year}`;
+              document.getElementById('calendar-popup-question').innerText = data.riddle;
+              document.getElementById('calendar-popup-answer').innerText = data.answer;
+              document.getElementById('calendar-popup').style.display = 'flex';
+            });
           }
           dayDiv.innerText = d;
           calendarEl.appendChild(dayDiv);
@@ -332,6 +397,7 @@ document.addEventListener('DOMContentLoaded', () => {
         updateCalendarLabel();
         updateNavButtons();
       }
+         
   
       // Initial build of the calendar.
       buildCalendar(currentCalendarMonth, currentCalendarYear);
@@ -341,13 +407,20 @@ document.addEventListener('DOMContentLoaded', () => {
         const now = new Date();
         const tomorrow = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
         const diffMs = tomorrow - now;
+    
+        // Calcula horas, minutos y segundos restantes
         const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
         const diffMinutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
-        // Ensure two digits by padding with zeros if necessary
+        const diffSeconds = Math.floor((diffMs % (1000 * 60)) / 1000);
+    
+        // Asegura que el formato sea siempre de dos dígitos
         const hoursStr = diffHours.toString().padStart(2, '0');
         const minutesStr = diffMinutes.toString().padStart(2, '0');
-        document.getElementById('timer').innerText = `${hoursStr}:${minutesStr}`;
-      }
+        const secondsStr = diffSeconds.toString().padStart(2, '0');
+    
+        // Actualiza el texto del temporizador con el formato HH:MM:SS
+        document.getElementById('timer').innerText = `${hoursStr}:${minutesStr}:${secondsStr}`;
+    }
       
       
       updateTimer();
@@ -365,6 +438,41 @@ document.addEventListener('DOMContentLoaded', () => {
         currentCalendarMonth++;
         buildCalendar(currentCalendarMonth, currentCalendarYear);
       });
+
+      document.getElementById('calendar-popup-close').addEventListener('click', () => {
+        document.getElementById('calendar-popup').style.display = 'none';
+      });
+
+      document.getElementById('success-popup-close').addEventListener('click', () => {
+        document.getElementById('success-popup').style.display = 'none';
+      });
+
+      //NAVBAR
+      document.getElementById('nav-home').addEventListener('click', (e) => {
+        e.preventDefault();
+        // Mostrar la sección del acertijo y ocultar las demás
+        document.getElementById('riddle-section').style.display = 'block';
+        document.getElementById('calendar-section').style.display = 'none';
+        document.getElementById('leaderboard-section').style.display = 'none';
+      });
+      
+      document.getElementById('nav-calendar').addEventListener('click', (e) => {
+        e.preventDefault();
+        // Mostrar la sección del calendario y ocultar las demás
+        document.getElementById('riddle-section').style.display = 'none';
+        document.getElementById('calendar-section').style.display = 'block';
+        document.getElementById('leaderboard-section').style.display = 'none';
+      });
+      
+      document.getElementById('nav-leaderboard').addEventListener('click', (e) => {
+        e.preventDefault();
+        // Mostrar la sección del leaderboard y ocultar las demás
+        document.getElementById('riddle-section').style.display = 'none';
+        document.getElementById('calendar-section').style.display = 'none';
+        document.getElementById('leaderboard-section').style.display = 'block';
+      });
+      
+      
     } // end showGame()
   
     // Optionally, you could refresh the leaderboard periodically.
