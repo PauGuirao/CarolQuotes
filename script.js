@@ -23,7 +23,24 @@ document.addEventListener('DOMContentLoaded', () => {
     // Initialize Firebase
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
-  
+
+      // Inicializa Firebase (ya lo tienes en tu script.js)
+// Luego, inicializa Firebase Messaging:
+const messaging = firebase.messaging();
+
+messaging.requestPermission()
+  .then(() => {
+    console.log('Permiso para notificaciones concedido.');
+    return messaging.getToken();
+  })
+  .then(token => {
+    console.log('Token de FCM:', token);
+    // Aquí puedes enviar el token a tu backend o almacenarlo en Firestore para futuras notificaciones
+  })
+  .catch(err => {
+    console.error('No se pudo obtener permiso para notificaciones:', err);
+  });
+
     // Global variable to hold the logged-in username.
     let currentUser = localStorage.getItem('currentUser') || null;
   
