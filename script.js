@@ -24,10 +24,6 @@ document.addEventListener('DOMContentLoaded', () => {
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
 
-      // Inicializa Firebase (ya lo tienes en tu script.js)
-// Luego, inicializa Firebase Messaging:
-
-
     // Global variable to hold the logged-in username.
     let currentUser = localStorage.getItem('currentUser') || null;
   
