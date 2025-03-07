@@ -25,6 +25,17 @@ document.addEventListener("DOMContentLoaded", () => {
   firebase.initializeApp(firebaseConfig);
   const db = firebase.firestore();
 
+  // Enable offline persistence for Firestore
+  db.enablePersistence().catch((err) => {
+    if (err.code === "failed-precondition") {
+      console.warn(
+        "Multiple tabs open. Persistence can only be enabled in one tab."
+      );
+    } else if (err.code === "unimplemented") {
+      console.warn("Persistence is not available in this browser.");
+    }
+  });
+
   // Global variable to hold the logged-in username.
   let currentUser = localStorage.getItem("currentUser") || null;
 
@@ -39,7 +50,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const logoutButton = document.getElementById("logout-button");
   const answerCard = document.getElementById("answer-card");
 
-  // Login event handler.
+  //////////////////////////////// Login event handler ////////////////////////////////
   loginButton.addEventListener("click", async () => {
     const username = usernameInput.value.trim();
     const errorMsg = document.getElementById("login-error");
@@ -60,7 +71,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // Logout event handler.
+  /////////////////////////////// Logout event handler ///////////////////////////////
   logoutButton.addEventListener("click", () => {
     localStorage.removeItem("currentUser");
     currentUser = null;
@@ -77,46 +88,137 @@ document.addEventListener("DOMContentLoaded", () => {
     return `${currentUser}_${key}`;
   }
 
-  // Load user data from Firestore.
+  ///////////////////////////// Load user data from Firestore /////////////////////////////
   async function loadUserData() {
+    const cacheKey = `userData_${currentUser}`;
+    const cacheTimestampKey = `userData_${currentUser}_timestamp`;
+    const now = Date.now();
+
+    // Intenta recuperar datos cacheados
+    const cachedData = localStorage.getItem(cacheKey);
+    const cachedTimestamp = localStorage.getItem(cacheTimestampKey);
+    if (cachedData && cachedTimestamp && now - cachedTimestamp < 300000) {
+      // 300000 ms = 5 minutos
+      console.log("Datos del usuario cargados desde cache.");
+      return JSON.parse(cachedData);
+    }
+
+    // Si no hay cache o está vencida, consulta Firestore
     const userDoc = await db.collection("users").doc(currentUser).get();
+    let userData;
     if (userDoc.exists) {
-      return userDoc.data();
+      userData = userDoc.data();
     } else {
-      // Crear datos por defecto, incluyendo carolCoins
-      const defaultData = {
+      // Crear datos por defecto si no existen
+      userData = {
         mistakeCount: 0,
         streak: 0,
         solved: {},
         carolCoins: 0,
       };
-      await db.collection("users").doc(currentUser).set(defaultData);
-      return defaultData;
+      await db.collection("users").doc(currentUser).set(userData);
+    }
+
+    // Guarda en cache los datos y la marca de tiempo
+    localStorage.setItem(cacheKey, JSON.stringify(userData));
+    localStorage.setItem(cacheTimestampKey, now);
+
+    console.log("Datos del usuario cargados desde Firestore y cacheados.");
+    return userData;
+  }
+
+  /////////////////////////////// Update user data in Firestore /////////////////////////////
+  async function updateUserData(newData) {
+    const cacheKey = `userData_${currentUser}`;
+    const cacheTimestampKey = `userData_${currentUser}_timestamp`;
+    const now = Date.now();
+
+    // Obtenemos la data actual (ya sea del caché o de Firestore)
+    let currentData = await loadUserData();
+    // Se combinan los datos: los atributos de newData sobrescriben los de currentData
+    const updatedData = { ...currentData, ...newData };
+
+    // Actualizamos Firestore con solo los datos nuevos
+    await db.collection("users").doc(currentUser).update(newData);
+
+    // Actualizamos el caché con la data combinada
+    localStorage.setItem(cacheKey, JSON.stringify(updatedData));
+    localStorage.setItem(cacheTimestampKey, now);
+
+    console.log("Datos actualizados y caché refrescado manualmente.");
+    return updatedData;
+  }
+
+  ///////////////////////////// Load and display the leaderboard /////////////////////////////
+  async function loadLeaderboard() {
+    const leaderboardEl = document.getElementById("leaderboard");
+    // Check if cached data exists and is fresh (e.g., 5 minutes)
+    const cache = localStorage.getItem("leaderboardCache");
+    const cacheTimestamp = localStorage.getItem("leaderboardCacheTimestamp");
+    const now = Date.now();
+
+    if (cache && cacheTimestamp && now - cacheTimestamp < 300000) {
+      leaderboardEl.innerHTML = cache;
+      console.log("Leaderboard loaded from cache.");
+      return;
+    }
+
+    // If no valid cache, query Firestore
+    try {
+      const usersSnapshot = await db
+        .collection("users")
+        .orderBy("streak", "desc")
+        .get();
+      leaderboardEl.innerHTML = ""; // Clear current content
+      usersSnapshot.forEach((doc) => {
+        const data = doc.data();
+        const username = doc.id;
+        const streak = data.streak || 0;
+        const li = document.createElement("li");
+        li.innerText = `${username}: ${streak}`;
+        leaderboardEl.appendChild(li);
+      });
+      // Cache the leaderboard HTML and timestamp in localStorage
+      localStorage.setItem("leaderboardCache", leaderboardEl.innerHTML);
+      localStorage.setItem("leaderboardCacheTimestamp", now);
+      console.log("Leaderboard loaded from Firestore and cached.");
+    } catch (error) {
+      console.error("Error loading leaderboard:", error);
     }
   }
 
-  // Update user data in Firestore.
-  async function updateUserData(data) {
-    await db.collection("users").doc(currentUser).update(data);
-  }
-
-  // Load and display the leaderboard.
-  async function loadLeaderboard() {
+  //////////////////////////////// Update the leaderboard ////////////////////////////////
+  async function updateLeaderboard() {
+    const cacheKey = "leaderboardCache";
+    const cacheTimestampKey = "leaderboardCacheTimestamp";
+    const now = Date.now();
     const leaderboardEl = document.getElementById("leaderboard");
-    leaderboardEl.innerHTML = "";
-    // Query all users ordered by 'streak' descending.
-    const usersSnapshot = await db
-      .collection("users")
-      .orderBy("streak", "desc")
-      .get();
-    usersSnapshot.forEach((doc) => {
-      const data = doc.data();
-      const username = doc.id; // Using the document ID as username.
-      const streak = data.streak || 0;
-      const li = document.createElement("li");
-      li.innerText = `${username}: ${streak}`;
-      leaderboardEl.appendChild(li);
-    });
+
+    try {
+      const snapshot = await db
+        .collection("users")
+        .orderBy("streak", "desc")
+        .get();
+
+      // Limpia el contenido actual del leaderboard
+      leaderboardEl.innerHTML = "";
+
+      snapshot.forEach((doc) => {
+        const data = doc.data();
+        const username = doc.id;
+        const streak = data.streak || 0;
+        const li = document.createElement("li");
+        li.innerText = `${username}: ${streak}`;
+        leaderboardEl.appendChild(li);
+      });
+
+      // Guarda el HTML generado y la marca de tiempo en el cache
+      localStorage.setItem(cacheKey, leaderboardEl.innerHTML);
+      localStorage.setItem(cacheTimestampKey, now);
+      console.log("Leaderboard actualizado y caché refrescado.");
+    } catch (error) {
+      console.error("Error al actualizar el leaderboard:", error);
+    }
   }
 
   // Function that initializes and runs the game logic.
@@ -181,6 +283,10 @@ document.addEventListener("DOMContentLoaded", () => {
         answer: "El silencio.",
       },
       {
+        riddle: "¿Qué se va y nunca regresa?",
+        answer: "El tiempo.",
+      },
+      {
         riddle:
           "¿Qué tiene 4 patas en la mañana, 2 patas al mediodía y 3 patas en la noche?",
         answer: "El hombre.",
@@ -198,10 +304,6 @@ document.addEventListener("DOMContentLoaded", () => {
         riddle:
           "¿Qué tiene agujeros por todas partes y aún puede retener agua?",
         answer: "Una esponja.",
-      },
-      {
-        riddle: "¿Qué se va y nunca regresa?",
-        answer: "El tiempo.",
       },
       {
         riddle: "¿Qué es lo que siempre viene pero nunca llega?",
@@ -247,11 +349,25 @@ document.addEventListener("DOMContentLoaded", () => {
     riddleElement.innerText = dailyRiddle.riddle;
 
     // Normalize function (ignores punctuation and case).
+    // Función de normalización: convierte a mayúsculas, elimina caracteres no alfanuméricos y espacios extra
     function normalize(text) {
       return text
-        .toLowerCase()
+        .toUpperCase()
         .replace(/[^\w\s]|_/g, "")
         .trim();
+    }
+
+    // Función para validar la respuesta
+    function isAnswerCorrect(userAnswer, correctAnswer) {
+      const normalizedUser = normalize(userAnswer);
+      const normalizedCorrect = normalize(correctAnswer);
+
+      // Si la respuesta del usuario es menor, se comprueba si está contenida en la respuesta correcta.
+      // O viceversa.
+      return (
+        normalizedCorrect.includes(normalizedUser) ||
+        normalizedUser.includes(normalizedCorrect)
+      );
     }
 
     // If today's riddle is already solved for this user, update the UI.
@@ -287,12 +403,17 @@ document.addEventListener("DOMContentLoaded", () => {
       answerElement.style.display = "block";
       userAnswerInput.disabled = true;
       submitAnswerButton.disabled = true;
+      showAnswerButton.disabled = true;
       popup.style.display = "none";
+
+      resultElement.className = "result-message fail";
+      resultElement.innerText = "Inténtalo de nuevo mañana :(!";
+      answerElement.innerText = `La respuesta correcta era: ${dailyRiddle.answer}`;
       await updateUserData({
         mistakeCount: userData.mistakeCount,
         streak: userData.streak,
       });
-      loadLeaderboard(); // update leaderboard after streak change
+      updateLeaderboard(); // update leaderboard after streak change
     });
 
     // Popup cancel: hide the popup.
@@ -305,7 +426,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const userAnswer = userAnswerInput.value;
       answerCard.classList.add("show"); // Muestra la tarjeta con animación
 
-      if (normalize(userAnswer) === normalize(dailyRiddle.answer)) {
+      if (isAnswerCorrect(userAnswer, dailyRiddle.answer)) {
         userData.solved[solvedKeyToday] = true;
         // Incrementar racha y sumar 10 CarolCoins
         userData.streak = (userData.streak || 0) + 1;
@@ -333,7 +454,7 @@ document.addEventListener("DOMContentLoaded", () => {
           carolCoins: userData.carolCoins,
         });
         buildCalendar(currentCalendarMonth, currentCalendarYear); // Actualiza el calendario
-        loadLeaderboard(); // Actualiza el leaderboard
+        updateLeaderboard(); // Actualiza el leaderboard
 
         // Mostrar popup de éxito
         const successPopup = document.getElementById("success-popup");
@@ -342,9 +463,8 @@ document.addEventListener("DOMContentLoaded", () => {
         successPopup.style.display = "flex";
       } else {
         resultElement.className = "result-message fail";
-        resultElement.innerText =
-          "Respuesta incorrecta. Inténtalo de nuevo mañana!";
-        answerElement.innerText = `La respuesta correcta era: ${dailyRiddle.answer}`;
+        resultElement.innerText = "Respuesta incorrecta. Inténtalo de nuevo!";
+        //answerElement.innerText = `La respuesta correcta era: ${dailyRiddle.answer}`;
       }
       // Muestra los elementos de respuesta
       answerElement.style.display = "block";
@@ -507,33 +627,6 @@ document.addEventListener("DOMContentLoaded", () => {
       .getElementById("success-popup-close")
       .addEventListener("click", () => {
         document.getElementById("success-popup").style.display = "none";
-      });
-
-    //NAVBAR
-    document.getElementById("nav-home").addEventListener("click", (e) => {
-      e.preventDefault();
-      // Mostrar la sección del acertijo y ocultar las demás
-      document.getElementById("riddle-section").style.display = "block";
-      document.getElementById("calendar-section").style.display = "none";
-      document.getElementById("leaderboard-section").style.display = "none";
-    });
-
-    document.getElementById("nav-calendar").addEventListener("click", (e) => {
-      e.preventDefault();
-      // Mostrar la sección del calendario y ocultar las demás
-      document.getElementById("riddle-section").style.display = "none";
-      document.getElementById("calendar-section").style.display = "block";
-      document.getElementById("leaderboard-section").style.display = "none";
-    });
-
-    document
-      .getElementById("nav-leaderboard")
-      .addEventListener("click", (e) => {
-        e.preventDefault();
-        // Mostrar la sección del leaderboard y ocultar las demás
-        document.getElementById("riddle-section").style.display = "none";
-        document.getElementById("calendar-section").style.display = "none";
-        document.getElementById("leaderboard-section").style.display = "block";
       });
   } // end showGame()
 

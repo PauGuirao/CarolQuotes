@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ACERTIJAZO - Leaderboard</title>
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="manifest" href="manifest.json" />
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-functions-compat.js"></script>
+    <!-- Font Awesome -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
+  </head>
+  <body>
+    <nav id="main-navbar">
+      <span class="navbar-title">ACERTIJAZOS</span>
+      <ul>
+        <li>
+          <a href="index.html" title="Inicio"><i class="fas fa-home"></i></a>
+        </li>
+        <li>
+          <a href="calendar.html" title="Calendario"
+            ><i class="fas fa-calendar-alt"></i
+          ></a>
+        </li>
+        <li>
+          <a href="leaderboard.html" title="Leaderboard"
+            ><i class="fas fa-trophy"></i
+          ></a>
+        </li>
+      </ul>
+    </nav>
+    <main class="main-container">
+      <h1>Leaderboard</h1>
+      <ul id="leaderboard">
+        <!-- Se llenará con la información de Firestore -->
+      </ul>
+    </main>
+    <script src="script-leaderboard.js"></script>
+  </body>
+</html>

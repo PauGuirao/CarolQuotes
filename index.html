@@ -3,6 +3,13 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- Habilitar modo standalone para iOS -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <!-- Opcional: estilo de la barra de estado -->
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+    <!-- Ícono para el home screen en iOS -->
+    <link rel="apple-touch-icon" href="icon-192x192.png" />
+
     <title>ACERTIJAZO</title>
     <link rel="stylesheet" href="styles.css" />
     <!-- Firebase SDKs -->
@@ -20,7 +27,7 @@
   <body>
     <!-- Navbar Global, siempre visible en la parte superior -->
     <nav id="main-navbar">
-      <span class="navbar-title">ACERTIJAZOS</span>
+      <span class="navbar-title">ACERTIJAZO</span>
       <ul>
         <li>
           <a href="#" id="nav-home" title="Inicio"
@@ -33,9 +40,9 @@
           ></a>
         </li>
         <li>
-          <a href="#" id="nav-leaderboard" title="Leaderboard"
-            ><i class="fas fa-trophy"></i
-          ></a>
+          <a href="leaderboard.html" id="nav-leaderboard" title="Leaderboard">
+            <i class="fas fa-trophy"></i>
+          </a>
         </li>
       </ul>
     </nav>
