@@ -42,13 +42,16 @@ document.addEventListener("DOMContentLoaded", () => {
   // Elements for login and game containers.
   const loginContainer = document.getElementById("login-container");
   const gameContainer = document.getElementById("game-container");
-  const welcomeMessage = document.getElementById("welcome-message");
   const streakCountElement = document.getElementById("streak-count");
   const carolCoinsElement = document.getElementById("carolCoins");
   const loginButton = document.getElementById("login-button");
   const usernameInput = document.getElementById("username-input");
-  const logoutButton = document.getElementById("logout-button");
   const answerCard = document.getElementById("answer-card");
+  const userBtn = document.getElementById("user-btn");
+  const userPopup = document.getElementById("user-popup");
+  const userNameEl = document.getElementById("user-name");
+  const logoutBtn = document.getElementById("logout-btn");
+  const userPopupClose = document.getElementById("user-popup-close");
 
   //////////////////////////////// Login event handler ////////////////////////////////
   loginButton.addEventListener("click", async () => {
@@ -72,7 +75,19 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   /////////////////////////////// Logout event handler ///////////////////////////////
-  logoutButton.addEventListener("click", () => {
+  userBtn.addEventListener("click", (e) => {
+    e.preventDefault(); // Evita la acción por defecto del enlace
+    userNameEl.innerText = `Usuario: ${currentUser}`;
+    userPopup.style.display = "flex";
+  });
+
+  // Botón para cerrar el popup
+  userPopupClose.addEventListener("click", () => {
+    userPopup.style.display = "none";
+  });
+
+  // Botón de logout
+  logoutBtn.addEventListener("click", () => {
     localStorage.removeItem("currentUser");
     currentUser = null;
     location.reload();
@@ -221,11 +236,178 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // Function that initializes and runs the game logic.
+  ///////////////////////// Load riddles ///////////////////////////
+  async function loadRiddles() {
+    try {
+      const response = await fetch("riddles.json");
+      if (!response.ok) {
+        throw new Error("Error al cargar el archivo riddles.json");
+      }
+      const riddles = await response.json();
+      return riddles;
+    } catch (error) {
+      console.error(error);
+      return []; // Devuelve un array vacío en caso de error
+    }
+  }
+
+  //////////////////////////// Build the keyboard ////////////////////////////
+  // Array of rows, each row is an array of keys
+  const keyboardRows = [
+    ["Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P"],
+    ["A", "S", "D", "F", "G", "H", "J", "K", "L", "Ñ"],
+    ["✔", "Z", "X", "C", "V", "B", "N", "M", "⌫"],
+  ];
+
+  // Build the keyboard inside the container with the given ID
+  function buildCustomKeyboard(containerId) {
+    const container = document.getElementById(containerId);
+    container.innerHTML = ""; // Clear any existing keyboard
+
+    keyboardRows.forEach((row) => {
+      const rowDiv = document.createElement("div");
+      rowDiv.classList.add("keyboard-row");
+
+      row.forEach((key) => {
+        const button = document.createElement("button");
+        button.classList.add("keyboard-key");
+        button.innerText = key;
+        button.dataset.key = key; // Store the key value
+
+        rowDiv.appendChild(button);
+      });
+
+      container.appendChild(rowDiv);
+    });
+  }
+
+  function attachKeyboardListeners(
+    letterInputsContainerId,
+    keyboardContainerId
+  ) {
+    const letterInputsContainer = document.getElementById(
+      letterInputsContainerId
+    );
+    const keyboardContainer = document.getElementById(keyboardContainerId);
+
+    // Keep track of the letter inputs
+    // (assuming buildLetterInputs already created them with class "letter-input")
+    const letterInputs =
+      letterInputsContainer.querySelectorAll(".letter-input");
+
+    // Helper: find the index of the first empty input
+    function getFirstEmptyIndex() {
+      for (let i = 0; i < letterInputs.length; i++) {
+        if (!letterInputs[i].value) {
+          return i;
+        }
+      }
+      return -1; // Means all filled
+    }
+
+    // Helper: find the index of the last filled input
+    function getLastFilledIndex() {
+      for (let i = letterInputs.length - 1; i >= 0; i--) {
+        if (letterInputs[i].value) {
+          return i;
+        }
+      }
+      return -1; // Means all are empty
+    }
+
+    keyboardContainer.addEventListener("click", (e) => {
+      const target = e.target;
+      if (!target.classList.contains("keyboard-key")) return; // ignore if not a key
+
+      const keyValue = target.dataset.key; // e.g. "A", "B", "⌫", "✔", etc.
+
+      // If it's the check symbol
+      if (keyValue === "✔") {
+        // Trigger your "submit" logic here if you want
+        console.log("Check/Enter key pressed. You can trigger a submit.");
+        return;
+      }
+
+      // If it's backspace
+      if (keyValue === "⌫") {
+        const lastIndex = getLastFilledIndex();
+        if (lastIndex >= 0) {
+          letterInputs[lastIndex].value = "";
+          letterInputs[lastIndex].focus();
+        }
+        return;
+      }
+
+      // Otherwise, it's a letter
+      const emptyIndex = getFirstEmptyIndex();
+      if (emptyIndex >= 0) {
+        letterInputs[emptyIndex].value = keyValue;
+        // Optionally move focus to next input
+        if (emptyIndex + 1 < letterInputs.length) {
+          letterInputs[emptyIndex + 1].focus();
+        }
+      }
+    });
+  }
+
+  //////////////////////// Function that builds the game input. ////////////////////////
+  function buildLetterInputs(answer, containerId) {
+    // Eliminar espacios y limpiar la respuesta
+    const letters = answer
+      .trim()
+      .replace(/\s+/g, "")
+      .replace(/[^\p{L}\p{N}]/gu, "");
+    const container = document.getElementById(containerId);
+    container.innerHTML = ""; // Limpia el contenedor
+
+    // Crear un input por cada letra
+    for (let i = 0; i < letters.length; i++) {
+      const input = document.createElement("input");
+      input.type = "text";
+      input.maxLength = 1;
+      input.classList.add("letter-input");
+      input.dataset.index = i; // Guardamos la posición si se requiere
+
+      // Prevent the native keyboard from appearing
+      input.readOnly = true;
+      input.setAttribute("inputmode", "none");
+
+      input.addEventListener("focus", (e) => {
+        e.target.blur();
+      });
+
+      // Listener para mover el foco automáticamente al siguiente input al escribir
+      input.addEventListener("input", (e) => {
+        const target = e.target;
+        if (target.value.length === 1) {
+          const nextInput = target.nextElementSibling;
+          if (nextInput && nextInput.tagName.toLowerCase() === "input") {
+            nextInput.focus();
+          }
+        }
+      });
+
+      // Listener para moverse al input anterior al presionar Backspace en un input vacío
+      input.addEventListener("keydown", (e) => {
+        if (e.key === "Backspace" && e.target.value === "") {
+          const prevInput = e.target.previousElementSibling;
+          if (prevInput && prevInput.tagName.toLowerCase() === "input") {
+            prevInput.focus();
+          }
+        }
+      });
+
+      container.appendChild(input);
+    }
+  }
+
+  //////////////////////// Function that initializes and runs the game logic. ////////////////////////
   async function showGame() {
     loginContainer.style.display = "none";
-    gameContainer.style.display = "block";
-    welcomeMessage.innerText = `Hola, ${currentUser}!`;
+    gameContainer.style.display = "flex";
+    gameContainer.style.justifyContent = "center";
+    gameContainer.style.alignItems = "center";
+    gameContainer.style.flexDirection = "column";
 
     const userData = await loadUserData();
     // Display current streak.
@@ -237,97 +419,21 @@ document.addEventListener("DOMContentLoaded", () => {
       userData.carolCoins || 0
     } <i class="fas fa-coins"></i>`;
 
+    updateDayTitle();
     await loadLeaderboard();
     // Constants and riddle definitions.
     const allowedYear = 2025; // Only allow viewing months in 2025
-    const riddles = [
-      {
-        riddle: "¿Qué tiene llaves pero no puede abrir cerraduras?",
-        answer: "Un piano.",
-      },
-      {
-        riddle: "¿Qué se moja mientras seca?",
-        answer: "Una toalla.",
-      },
-      {
-        riddle:
-          "Sin boca hablo, sin oídos oigo, sin cuerpo existo, pero con el viento cobro vida. ¿Qué soy?",
-        answer: "Un eco.",
-      },
-      {
-        riddle: "¿Qué cosa, cuanto más le quitas, más grande se vuelve?",
-        answer: "Un agujero.",
-      },
-      {
-        riddle: "¿Qué sube y baja pero no se mueve?",
-        answer: "Las escaleras.",
-      },
-      {
-        riddle: "¿Qué tiene un ojo pero no puede ver?",
-        answer: "Una aguja.",
-      },
-      {
-        riddle: "¿Qué pesa más, un kilo de plumas o un kilo de plomo?",
-        answer: "Pesan lo mismo.",
-      },
-      {
-        riddle: "¿Qué corre pero nunca camina?",
-        answer: "El agua.",
-      },
-      {
-        riddle: "¿Quien es la futura mujer del Pau?",
-        answer: "Carol",
-      },
-      {
-        riddle: "¿Qué se rompe sin ser tocado?",
-        answer: "El silencio.",
-      },
-      {
-        riddle: "¿Qué se va y nunca regresa?",
-        answer: "El tiempo.",
-      },
-      {
-        riddle:
-          "¿Qué tiene 4 patas en la mañana, 2 patas al mediodía y 3 patas en la noche?",
-        answer: "El hombre.",
-      },
-      {
-        riddle:
-          "¿Qué tiene ciudades, pero no casas; montañas, pero no árboles; y agua, pero no peces?",
-        answer: "Un mapa.",
-      },
-      {
-        riddle: "¿Qué puede llenar una habitación pero no ocupa espacio?",
-        answer: "La luz.",
-      },
-      {
-        riddle:
-          "¿Qué tiene agujeros por todas partes y aún puede retener agua?",
-        answer: "Una esponja.",
-      },
-      {
-        riddle: "¿Qué es lo que siempre viene pero nunca llega?",
-        answer: "El mañana.",
-      },
-      {
-        riddle: "¿Qué tiene orejas pero no oye?",
-        answer: "El maíz.",
-      },
-      {
-        riddle: "¿Qué va por el agua y no se moja?",
-        answer: "La sombra.",
-      },
-      {
-        riddle: "¿Qué se abre y nunca cierra?",
-        answer: "Una herida.",
-      },
-    ];
+    // Cargar los acertijos desde el archivo JSON
+    const riddles = await loadRiddles();
+    if (!riddles.length) {
+      console.error("No se pudieron cargar los acertijos.");
+      return;
+    }
 
     // DOM elements for the game.
     const riddleElement = document.getElementById("riddle");
     const showAnswerButton = document.getElementById("show-answer");
     const answerElement = document.getElementById("answer");
-    const userAnswerInput = document.getElementById("user-answer");
     const submitAnswerButton = document.getElementById("submit-answer");
     const resultElement = document.getElementById("result");
     const popup = document.getElementById("popup");
@@ -345,39 +451,42 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Select today's riddle (same for all users).
     const dailyRiddle = riddles[dayOfYearToday % riddles.length];
+    // Supongamos que ya tienes dailyRiddle definido:
+    buildLetterInputs(dailyRiddle.answer, "letter-inputs");
+    // Build the keyboard
+    buildCustomKeyboard("custom-keyboard");
+    // Attach the keyboard logic
+    attachKeyboardListeners("letter-inputs", "custom-keyboard");
 
     riddleElement.innerText = dailyRiddle.riddle;
 
-    // Normalize function (ignores punctuation and case).
-    // Función de normalización: convierte a mayúsculas, elimina caracteres no alfanuméricos y espacios extra
-    function normalize(text) {
-      return text
-        .toUpperCase()
-        .replace(/[^\w\s]|_/g, "")
-        .trim();
-    }
-
-    // Función para validar la respuesta
-    function isAnswerCorrect(userAnswer, correctAnswer) {
-      const normalizedUser = normalize(userAnswer);
-      const normalizedCorrect = normalize(correctAnswer);
-
-      // Si la respuesta del usuario es menor, se comprueba si está contenida en la respuesta correcta.
-      // O viceversa.
-      return (
-        normalizedCorrect.includes(normalizedUser) ||
-        normalizedUser.includes(normalizedCorrect)
-      );
-    }
-
     // If today's riddle is already solved for this user, update the UI.
-    if (userData.solved[solvedKeyToday]) {
+    if (userData.solved && userData.solved[solvedKeyToday]) {
+      // Mostrar mensaje de acertado y la respuesta
       answerCard.classList.add("show");
       answerElement.innerText = dailyRiddle.answer;
       answerElement.style.display = "block";
-      userAnswerInput.disabled = true;
+
+      // Rellenar y resaltar los inputs de letras
+      const letterInputs = document.querySelectorAll(
+        "#letter-inputs .letter-input"
+      );
+      // Limpiar la respuesta: quitamos espacios y signos para que coincida la cantidad de inputs
+      const letters = dailyRiddle.answer
+        .trim()
+        .replace(/\s+/g, "")
+        .replace(/[^\p{L}\p{N}]/gu, "");
+      letterInputs.forEach((input, index) => {
+        input.value = letters[index] || "";
+        input.disabled = true;
+        input.classList.add("solved-letter");
+      });
+
+      // Deshabilitar los botones de submit y show answer
       submitAnswerButton.disabled = true;
       showAnswerButton.disabled = true;
+
+      // Mostrar mensaje en el resultado
       resultElement.innerText =
         "Ya has solucionado el acertijo de hoy, vuelve mañana! Era:";
       resultElement.style.display = "block";
@@ -401,7 +510,6 @@ document.addEventListener("DOMContentLoaded", () => {
       } <i class="fas fa-coins"></i>`;
       answerElement.innerText = dailyRiddle.answer;
       answerElement.style.display = "block";
-      userAnswerInput.disabled = true;
       submitAnswerButton.disabled = true;
       showAnswerButton.disabled = true;
       popup.style.display = "none";
@@ -423,12 +531,37 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Submit answer button handler.
     submitAnswerButton.addEventListener("click", async () => {
-      const userAnswer = userAnswerInput.value;
-      answerCard.classList.add("show"); // Muestra la tarjeta con animación
+      // Recoger todos los inputs de letras
+      const letterInputs = document.querySelectorAll(
+        "#letter-inputs .letter-input"
+      );
+      let userAnswer = "";
+      letterInputs.forEach((input) => {
+        userAnswer += input.value;
+      });
+      console.log("Respuesta formada:", userAnswer);
+      // Función de normalización (ya definida)
+      function normalize(text) {
+        return text
+          .toUpperCase()
+          .replace(/[^\w\s]|_/g, "")
+          .trim();
+      }
+
+      // Función para validar la respuesta
+      function isAnswerCorrect(userAnswer, correctAnswer) {
+        const normalizedUser = normalize(userAnswer);
+        const normalizedCorrect = normalize(correctAnswer);
+        return (
+          normalizedCorrect.includes(normalizedUser) ||
+          normalizedUser.includes(normalizedCorrect)
+        );
+      }
+
+      answerCard.classList.add("show");
 
       if (isAnswerCorrect(userAnswer, dailyRiddle.answer)) {
         userData.solved[solvedKeyToday] = true;
-        // Incrementar racha y sumar 10 CarolCoins
         userData.streak = (userData.streak || 0) + 1;
         userData.carolCoins = (userData.carolCoins || 0) + 10;
 
@@ -441,10 +574,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
         resultElement.className = "result-message success";
         resultElement.innerText = "Has acertado el acertijo hoy! Era:";
-        answerElement.innerText = `Respuesta: ${dailyRiddle.answer}`;
+        answerElement.innerText = `${dailyRiddle.answer}`;
 
         answerElement.style.display = "block";
-        userAnswerInput.disabled = true;
+        // Deshabilitar y marcar inputs con estilo verde
+        letterInputs.forEach((input) => {
+          input.disabled = true;
+          input.classList.add("solved-letter");
+        });
         submitAnswerButton.disabled = true;
         showAnswerButton.disabled = true;
 
@@ -453,10 +590,9 @@ document.addEventListener("DOMContentLoaded", () => {
           streak: userData.streak,
           carolCoins: userData.carolCoins,
         });
-        buildCalendar(currentCalendarMonth, currentCalendarYear); // Actualiza el calendario
-        updateLeaderboard(); // Actualiza el leaderboard
+        buildCalendar(currentCalendarMonth, currentCalendarYear);
+        updateLeaderboard();
 
-        // Mostrar popup de éxito
         const successPopup = document.getElementById("success-popup");
         const successMessage = document.getElementById("success-message");
         successMessage.innerText = `¡Felicidades, has acertado! Has ganado +10 CarolCoins. La respuesta correcta es: ${dailyRiddle.answer}`;
@@ -464,11 +600,12 @@ document.addEventListener("DOMContentLoaded", () => {
       } else {
         resultElement.className = "result-message fail";
         resultElement.innerText = "Respuesta incorrecta. Inténtalo de nuevo!";
-        //answerElement.innerText = `La respuesta correcta era: ${dailyRiddle.answer}`;
+        // Opcional: limpiar inputs para que el usuario reintente
+        letterInputs.forEach((input) => (input.value = ""));
       }
-      // Muestra los elementos de respuesta
-      answerElement.style.display = "block";
+
       resultElement.style.display = "block";
+      answerElement.style.display = "block";
     });
 
     // Utility: compute day of year for any date.
@@ -508,7 +645,7 @@ document.addEventListener("DOMContentLoaded", () => {
       calendarEl.innerHTML = ""; // Limpiar entradas previas
 
       const now = new Date();
-      // Obtén la fecha de hoy a medianoche para comparar solo la parte de la fecha
+      // Fecha de hoy a medianoche para comparar solo la parte de la fecha
       const todayMidnight = new Date(
         now.getFullYear(),
         now.getMonth(),
@@ -524,46 +661,61 @@ document.addEventListener("DOMContentLoaded", () => {
           `riddleSolved_${year}_${dayOfYear}`
         );
         const solved = userData.solved[solvedKeyForDay];
-
         const dayDiv = document.createElement("div");
         dayDiv.classList.add("calendar-day");
 
-        // Determina si el día es futuro comparándolo con todayMidnight
         if (currentDate > todayMidnight) {
           dayDiv.classList.add("future");
         } else {
-          dayDiv.classList.add(solved ? "solved" : "unsolved");
-          // Solo se añade el listener si el día ya pasó o es el actual
-          dayDiv.addEventListener("click", async () => {
-            // Creamos un ID de documento para el día, por ejemplo "2025_150"
-            const clickedDate = new Date(year, month, d);
-            const dayOfYearClicked = getDayOfYear(clickedDate);
-            const docId = `${year}_${dayOfYearClicked}`;
-            const docRef = db.collection("dailyRiddles").doc(docId);
-            let docSnap = await docRef.get();
-            let data;
-            if (!docSnap.exists) {
-              // Si no existe, obtenemos el acertijo de nuestro arreglo (repetido cíclicamente)
-              const index = dayOfYearClicked % riddles.length;
-              data = {
-                riddle: riddles[index].riddle,
-                answer: riddles[index].answer,
-                date: clickedDate.toISOString(),
-              };
-              await docRef.set(data);
+          // Si es hoy, asignamos una clase especial
+          if (currentDate.getTime() === todayMidnight.getTime()) {
+            if (solved) {
+              dayDiv.classList.add("solved");
             } else {
-              data = docSnap.data();
+              dayDiv.classList.add("today-unsolved");
             }
-            // Mostrar el popup del calendario con la información
-            document.getElementById(
-              "calendar-popup-title"
-            ).innerText = `Acertijo del día ${d}/${month + 1}/${year}`;
-            document.getElementById("calendar-popup-question").innerText =
-              data.riddle;
-            document.getElementById("calendar-popup-answer").innerText =
-              data.answer;
-            document.getElementById("calendar-popup").style.display = "flex";
-          });
+          } else {
+            // Para días pasados
+            dayDiv.classList.add(solved ? "solved" : "unsolved");
+          }
+
+          // Agregar el listener de clic solo para:
+          // - Días pasados (currentDate < todayMidnight)
+          // - Día actual, pero solo si ya está resuelto.
+          if (
+            currentDate < todayMidnight ||
+            (currentDate.getTime() === todayMidnight.getTime() && solved)
+          ) {
+            dayDiv.addEventListener("click", async () => {
+              const clickedDate = new Date(year, month, d);
+              const dayOfYearClicked = getDayOfYear(clickedDate);
+              const docId = `${year}_${dayOfYearClicked}`;
+              const docRef = db.collection("dailyRiddles").doc(docId);
+              let data;
+              let docSnap = await docRef.get();
+              if (!docSnap.exists) {
+                // Si no existe, obtenemos el acertijo de nuestro arreglo (repetido cíclicamente)
+                const index = dayOfYearClicked % riddles.length;
+                data = {
+                  riddle: riddles[index].riddle,
+                  answer: riddles[index].answer,
+                  date: clickedDate.toISOString(),
+                };
+                await docRef.set(data);
+              } else {
+                data = docSnap.data();
+              }
+              // Mostrar el popup con la información del día
+              document.getElementById(
+                "calendar-popup-title"
+              ).innerText = `Acertijo del día ${d}/${month + 1}/${year}`;
+              document.getElementById("calendar-popup-question").innerText =
+                data.riddle;
+              document.getElementById("calendar-popup-answer").innerText =
+                data.answer;
+              document.getElementById("calendar-popup").style.display = "flex";
+            });
+          }
         }
         dayDiv.innerText = d;
         calendarEl.appendChild(dayDiv);
@@ -633,3 +785,12 @@ document.addEventListener("DOMContentLoaded", () => {
   // Optionally, you could refresh the leaderboard periodically.
   // loadLeaderboard();
 });
+
+function updateDayTitle() {
+  const dayTitle = document.getElementById("day-title");
+  const today = new Date();
+  // Formato sin el día de la semana: "8 de marzo de 2025"
+  const options = { year: "numeric", month: "long", day: "numeric" };
+  dayTitle.innerText = today.toLocaleDateString("es-ES", options);
+  dayTitle.style.display = "block"; // Se muestra solo cuando se está jugando
+}

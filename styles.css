@@ -29,13 +29,14 @@ body {
   margin-top: 90px;
 }
 
-.main-container {
+#main-navbar {
   display: flex;
-  justify-content: center;
+  justify-content: center; /* Distribuye el espacio entre contenedores */
   align-items: center;
-  flex-direction: column;
-  gap: 20px;
+  background-color: #007bff;
+  padding: 10px 20px;
 }
+
 /* Navbar principal */
 #main-navbar {
   padding: 10px 20px;
@@ -44,6 +45,32 @@ body {
   background-color: #ececec;
 }
 
+/* Contenedor izquierdo */
+.nav-left {
+  flex: 1; /* Toma un espacio proporcional */
+  text-align: center;
+}
+
+/* Contenedor central */
+.nav-center {
+  flex: 1;
+  text-align: center;
+}
+
+/* Contenedor derecho */
+.nav-right {
+  flex: 1;
+  text-align: center;
+}
+/* Estilos para los enlaces del navbar */
+#main-navbar a {
+  color: #232323;
+  text-decoration: none;
+  font-size: 1.1rem;
+  padding: 5px 10px;
+  border-radius: 5px;
+  transition: background-color 0.3s;
+}
 /* Botones del navbar en fila centrada */
 #main-navbar ul {
   list-style: none;
@@ -59,13 +86,12 @@ body {
   color: rgb(50, 50, 50);
   font-size: 2rem;
   font-weight: bold;
-  margin-bottom: 10px;
   display: block;
 }
 /* Ajuste responsivo para pantallas pequeñas */
 @media (max-width: 600px) {
   .navbar-title {
-    font-size: 1.7rem;
+    font-size: 1.5rem;
   }
   #main-navbar ul {
     flex-direction: row;
@@ -161,12 +187,6 @@ body {
 }
 
 /* Common Card Styling */
-.card {
-  background-color: #fff;
-  border-radius: 10px;
-  padding: 20px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-}
 .answer-card {
   padding: 20px;
   border-radius: 10px;
@@ -207,6 +227,7 @@ body {
   border-radius: 8px;
   margin-top: 10px;
   border-left: 5px solid #007bff;
+  text-transform: uppercase;
 }
 
 /* Efecto de aparición */
@@ -226,9 +247,17 @@ body {
 
 /* Increase riddle font size (if not set inline) */
 #riddle {
-  font-size: 1.5rem;
+  background-color: #d7faff; /* Un color de fondo suave (AliceBlue) */
+  font-size: 1.6rem;
+  font-weight: bold;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   text-align: center;
+  margin-bottom: 20px;
+  text-transform: uppercase;
 }
+
 .riddle-card {
   padding-top: 30px;
   display: flex;
@@ -238,8 +267,13 @@ body {
   margin-bottom: 20px;
 }
 
-/* Input and Button styling */
-input[type="text"] {
+.card {
+  background-color: #fff;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+#user-answer {
   width: 100%;
   padding: 10px;
   font-size: 1rem;
@@ -247,6 +281,10 @@ input[type="text"] {
   text-transform: uppercase;
 }
 #username-input {
+  width: 100%;
+  padding: 10px;
+  font-size: 1rem;
+  margin-top: 10px;
   text-transform: none !important;
 }
 
@@ -306,11 +344,21 @@ button:disabled:hover {
 }
 
 .solved {
-  background-color: green;
+  background-color: rgb(71, 195, 71);
 }
 
 .unsolved {
-  background-color: red;
+  background-color: rgb(219, 61, 61);
+}
+/* Para el día actual sin resolver, usa otro color, por ejemplo, amarillo */
+.today-unsolved {
+  background-color: #f2d359; /* amarillo */
+}
+
+.letter-input.solved-letter {
+  background-color: #d4edda; /* Fondo verde claro */
+  border: 2px solid #28a745; /* Borde verde */
+  color: #155724;
 }
 
 .future {
@@ -468,6 +516,7 @@ button:disabled:hover {
   /* Reduce padding in cards */
   .card {
     padding: 10px;
+    padding-top: 20px;
   }
 
   /* Adjust input and button sizes */
@@ -487,7 +536,7 @@ button:disabled:hover {
 }
 
 .user-solution {
-  width: 90%;
+  width: 100%;
 }
 
 .buttons-riddle {
@@ -561,4 +610,61 @@ button:disabled:hover {
 .leaderboard-streak {
   font-size: 1.2rem;
   color: #e6790c; /* Por ejemplo, un color dorado para resaltar la racha */
+}
+
+/* Estilos inputs separados */
+#letter-inputs {
+  text-align: center; /* Para centrar todos los inputs */
+  margin-top: 10px;
+}
+.letter-input {
+  width: 45px; /* Ancho fijo */
+  height: 45px; /* Alto fijo */
+  font-size: 1.8rem !important;
+  text-align: center;
+  margin: 0 3px; /* Espacio entre cuadros */
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  display: inline-block; /* Alineación horizontal */
+  text-transform: uppercase;
+}
+
+/* Estilos para el keyboard */
+#custom-keyboard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 20px;
+}
+
+.keyboard-row {
+  display: flex;
+  gap: 3px;
+}
+
+.keyboard-key {
+  display: flex;
+  justify-content: center;
+  background-color: #666;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  width: 34px;
+  height: 42px;
+  font-size: 1.2rem;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.keyboard-key:hover {
+  background-color: #555;
+}
+
+.day-title {
+  text-align: center;
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #2c2c2c;
+  margin: 20px 0;
 }

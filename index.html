@@ -27,24 +27,25 @@
   <body>
     <!-- Navbar Global, siempre visible en la parte superior -->
     <nav id="main-navbar">
-      <span class="navbar-title">ACERTIJAZO</span>
-      <ul>
-        <li>
-          <a href="#" id="nav-home" title="Inicio"
-            ><i class="fas fa-home"></i
-          ></a>
-        </li>
-        <li>
-          <a href="#" id="nav-calendar" title="Calendario"
-            ><i class="fas fa-calendar-alt"></i
-          ></a>
-        </li>
-        <li>
-          <a href="leaderboard.html" id="nav-leaderboard" title="Leaderboard">
-            <i class="fas fa-trophy"></i>
-          </a>
-        </li>
-      </ul>
+      <div class="nav-left">
+        <a href="index.html" id="nav-home" title="Inicio">
+          <i class="fas fa-home"></i>
+        </a>
+        <a href="#" id="user-btn" title="Perfil">
+          <i class="fas fa-user"></i>
+        </a>
+      </div>
+      <div class="nav-center">
+        <span class="navbar-title">ACERTIJAZOS</span>
+      </div>
+      <div class="nav-right">
+        <a href="calendar.html" id="nav-calendar" title="Calendario">
+          <i class="fas fa-calendar-alt"></i>
+        </a>
+        <a href="leaderboard.html" id="nav-leaderboard" title="Leaderboard">
+          <i class="fas fa-trophy"></i>
+        </a>
+      </div>
     </nav>
 
     <main class="main-container">
@@ -67,16 +68,7 @@
       <!-- Game Container (hidden until user logs in) -->
       <div id="game-container" class="" style="display: none">
         <!-- Header Section: Title and Timer Centered; User Info at Top Right -->
-        <header id="main-header">
-          <div id="header-center" style="display: none">
-            <h1>EL ACERTIJAZO</h1>
-          </div>
-          <div id="header-right">
-            <span id="welcome-message"></span>
-            <button id="logout-button">Logout</button>
-          </div>
-        </header>
-
+        <div id="day-title" class="day-title"></div>
         <!-- Cards Container -->
         <div class="cards-container">
           <!-- Left Column: Riddle Card (without title/timer) -->
@@ -89,11 +81,9 @@
             <div class="card riddle-card">
               <p id="riddle"></p>
               <div class="user-solution">
-                <input
-                  type="text"
-                  id="user-answer"
-                  placeholder="Tu respuesta"
-                />
+                <div id="letter-inputs"></div>
+                <!-- Contenedor para el teclado custom -->
+                <div id="custom-keyboard"></div>
                 <div class="buttons-riddle">
                   <button id="submit-answer" class="submit">Soluciona</button>
                   <button id="show-answer" class="submit">Rendirse</button>
@@ -162,6 +152,17 @@
             <h2 class="popup-title">¡Felicidades! 🎉</h2>
             <p id="success-message" class="popup-message"></p>
             <button id="success-popup-close" class="popup-btn confirm">
+              Cerrar
+            </button>
+          </div>
+        </div>
+        <!-- Popup de perfil de usuario -->
+        <div id="user-popup" class="popup-overlay" style="display: none">
+          <div class="popup-content">
+            <h2>Perfil de Usuario</h2>
+            <p id="user-name"></p>
+            <button id="logout-btn" class="popup-btn confirm">Logout</button>
+            <button id="user-popup-close" class="popup-btn cancel">
               Cerrar
             </button>
           </div>
