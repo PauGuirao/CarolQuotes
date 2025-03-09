@@ -13,7 +13,7 @@ if ("serviceWorker" in navigator) {
 // ===============================
 // DOMContentLoaded: App Initialization
 // ===============================
-document.addEventListener("DOMContentLoaded", async () => {
+document.addEventListener("DOMContentLoaded", () => {
   // Firebase configuration – replace with your own project config.
   const firebaseConfig = {
     apiKey: "AIzaSyDL0DkMeKuCbPSzDA0TT56q3pO1I08rT1k",
