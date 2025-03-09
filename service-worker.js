@@ -1,36 +1,3 @@
-// Import Firebase scripts for the compat version
-importScripts(
-  "https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"
-);
-importScripts(
-  "https://www.gstatic.com/firebasejs/9.22.1/firebase-messaging-compat.js"
-);
-
-// Initialize Firebase in the service worker
-firebase.initializeApp({
-  apiKey: "AIzaSyDL0DkMeKuCbPSzDA0TT56q3pO1I08rT1k",
-  authDomain: "carolquotes-eff2e.firebaseapp.com",
-  projectId: "carolquotes-eff2e",
-  storageBucket: "carolquotes-eff2e.firebasestorage.app",
-  messagingSenderId: "251432655094",
-  appId: "1:251432655094:web:5f20dd75c907500709b4d7",
-  measurementId: "G-5JNTDYBL7B",
-});
-
-const messaging = firebase.messaging();
-
-// Handle background messages for push notifications
-messaging.onBackgroundMessage(function (payload) {
-  console.log("[service-worker.js] Received background message ", payload);
-  const notificationTitle = payload.notification?.title || "Background Message";
-  const notificationOptions = {
-    body: payload.notification?.body || "You have received a new message.",
-    icon: "/icon-192x192.png",
-  };
-
-  self.registration.showNotification(notificationTitle, notificationOptions);
-});
-
 // -------------------------
 // Caching Logic
 // -------------------------

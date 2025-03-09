@@ -13,7 +13,7 @@ if ("serviceWorker" in navigator) {
 // ===============================
 // DOMContentLoaded: App Initialization
 // ===============================
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
   // Firebase configuration – replace with your own project config.
   const firebaseConfig = {
     apiKey: "AIzaSyDL0DkMeKuCbPSzDA0TT56q3pO1I08rT1k",
@@ -27,37 +27,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Initialize Firebase
   firebase.initializeApp(firebaseConfig);
-  const messaging = firebase.messaging();
-  navigator.serviceWorker
-    .register("/service-worker.js")
-    .then((registration) => {
-      console.log("Service worker registered with scope:", registration.scope);
-
-      // Request permission and get the token, passing the service worker registration in the options.
-      Notification.requestPermission()
-        .then((permission) => {
-          if (permission === "granted") {
-            return messaging.getToken({
-              serviceWorkerRegistration: registration,
-              vapidKey:
-                "BOlRfGopi3Yk3RaCk1stJQbx-UbO8np-5NEwJ0iGwTrAO7E4uqteVoER_oGuii7V8R5lxr9Ti4qWPHrQIspv8Y0",
-            });
-          } else {
-            throw new Error("Notification permission not granted");
-          }
-        })
-        .then((token) => {
-          console.log("FCM Token:", token);
-          // Optionally, store the token in Firestore for later use.
-        })
-        .catch((error) => {
-          console.error("Error getting token:", error);
-        });
-    })
-    .catch((error) => {
-      console.error("Service Worker registration failed:", error);
-    });
-
   const db = firebase.firestore();
 
   // Enable offline persistence
