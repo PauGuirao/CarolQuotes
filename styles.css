@@ -1,21 +1,43 @@
-/* Reset defaults */
+/* =======================================
+   CSS Variables & Global Reset
+========================================== */
+:root {
+  --primary-color: #007bff;
+  --secondary-color: #ececec;
+  --light-bg: #f5f5f5;
+  --text-color: #333;
+  --dark-text: #232323;
+  --nav-text: rgb(50, 50, 50);
+  --nav-hover: #0056b3;
+  --border-color: #ccc;
+  --green: #28a745;
+  --red: #dc3545;
+  --yellow: #f2d359;
+  --gold: #ffd700;
+  --font-family: Arial, sans-serif;
+}
+
 * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
 
-/* Body styling */
+/* =======================================
+   Base Styles
+========================================== */
 body {
-  font-family: Arial, sans-serif;
-  background-color: #f5f5f5;
-  color: #333;
+  font-family: var(--font-family);
+  background-color: var(--light-bg);
+  color: var(--text-color);
   justify-content: center;
   align-items: center;
   min-height: 100vh;
 }
 
-/* Container for login and game screens */
+/* =======================================
+   Containers
+========================================== */
 .container {
   width: 90%;
   max-width: 1200px;
@@ -25,53 +47,49 @@ body {
   border-radius: 10px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
+
 #login-container {
   margin-top: 90px;
 }
 
+/* =======================================
+   Navigation
+========================================== */
 #main-navbar {
   display: flex;
-  justify-content: center; /* Distribuye el espacio entre contenedores */
+  justify-content: center;
   align-items: center;
-  background-color: #007bff;
-  padding: 10px 20px;
-}
-
-/* Navbar principal */
-#main-navbar {
   padding: 10px 20px;
   text-align: center;
   border-bottom: 1px solid #dadada;
-  background-color: #ececec;
+  background-color: var(--secondary-color);
 }
 
-/* Contenedor izquierdo */
-.nav-left {
-  flex: 1; /* Toma un espacio proporcional */
-  text-align: center;
-}
-
-/* Contenedor central */
-.nav-center {
-  flex: 1;
-  text-align: center;
-}
-
-/* Contenedor derecho */
+.nav-left,
+.nav-center,
 .nav-right {
   flex: 1;
   text-align: center;
 }
-/* Estilos para los enlaces del navbar */
+
 #main-navbar a {
-  color: #232323;
+  color: var(--dark-text);
   text-decoration: none;
   font-size: 1.1rem;
   padding: 5px 10px;
   border-radius: 5px;
   transition: background-color 0.3s;
 }
-/* Botones del navbar en fila centrada */
+
+#main-navbar li a {
+  font-size: 1.4rem;
+  padding: 8px 15px;
+}
+
+#main-navbar li a:hover {
+  background-color: var(--nav-hover);
+}
+
 #main-navbar ul {
   list-style: none;
   display: flex;
@@ -81,14 +99,14 @@ body {
   margin: 0;
 }
 
-/* Estilos para el título del navbar */
 .navbar-title {
-  color: rgb(50, 50, 50);
+  color: var(--nav-text);
   font-size: 2rem;
   font-weight: bold;
   display: block;
 }
-/* Ajuste responsivo para pantallas pequeñas */
+
+/* Responsive Navigation */
 @media (max-width: 600px) {
   .navbar-title {
     font-size: 1.5rem;
@@ -99,34 +117,21 @@ body {
   }
 }
 
-#main-navbar li a {
-  color: rgb(50, 50, 50);
-  text-decoration: none;
-  font-size: 1.4rem;
-  padding: 8px 15px;
-  border-radius: 5px;
-  transition: background-color 0.3s;
-}
-
-#main-navbar li a:hover {
-  background-color: #0056b3;
-}
-
-/* Header Section */
+/* =======================================
+   Header Section
+========================================== */
 #main-header {
-  margin-top: 10px;
+  margin: 10px 0 20px;
   display: flex;
   justify-content: space-between;
   align-items: center;
   border-bottom: 1px solid #ddd;
   padding-bottom: 10px;
-  margin-bottom: 20px;
 }
 
-/* Header center: title and timer */
 #header-center {
-  text-align: center;
   flex: 1;
+  text-align: center;
 }
 
 #header-center h1 {
@@ -137,100 +142,75 @@ body {
 
 #header-center p {
   font-size: 1.2rem;
-  color: #333;
+  color: var(--text-color);
 }
+
 #timer {
   font-size: 1.5rem;
   color: #242424;
   background-color: #f1f1f1;
   padding: 5px 10px;
-  border-radius: 8px;
   border: 1px solid #ddd;
+  border-radius: 8px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  margin-top: 10px;
-  margin-bottom: 10px;
+  margin: 10px 0;
   display: inline-block;
 }
 
-/* Header right: user info and logout */
 #header-right {
   display: flex;
   align-items: center;
   gap: 10px;
 }
+
 #logout-button {
-  margin-top: 0px;
+  margin-top: 0;
 }
 
 #header-right span {
   font-size: 1rem;
-  color: #333;
+  color: var(--text-color);
 }
 
-/* Cards Container Layout */
+/* =======================================
+   Cards & Layout
+========================================== */
 .cards-container {
   display: flex;
   gap: 20px;
 }
 
-/* Left Column: Riddle Card */
 .left-column {
-  flex: 0 0 600px; /* Fixed width */
+  flex: 0 0 600px;
 }
 
-/* Right Column: Calendar & Leaderboard stacked */
 .right-column {
-  flex: 0 0 320px; /* Fixed width */
+  flex: 0 0 320px;
   display: flex;
   flex-direction: column;
   gap: 20px;
 }
 
-/* Common Card Styling */
+.card,
 .answer-card {
-  padding: 20px;
+  background-color: #fff;
   border-radius: 10px;
-  margin-top: 0px;
+  padding: 20px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.answer-card {
   margin-bottom: 20px;
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
   transition: all 0.3s ease;
   text-align: center;
-  display: none; /* Mantenerlo oculto inicialmente */
+  display: none;
 }
-/* Animación de aparición */
+
 .answer-card.show {
   display: block;
   animation: fadeIn 0.5s ease forwards;
 }
-/* Mensaje de éxito */
-.result-message.success {
-  color: #28a745; /* Verde */
-  font-size: 1.8rem;
-  margin-bottom: 10px;
-  font-weight: bold;
-}
 
-/* Mensaje de error */
-.result-message.fail {
-  color: #dc3545; /* Rojo */
-  font-size: 1.8rem;
-  margin-bottom: 10px;
-  font-weight: bold;
-}
-
-/* Mensaje de respuesta */
-.answer-message {
-  color: #555;
-  font-size: 1.5rem;
-  background-color: #f1f1f1;
-  padding: 10px;
-  border-radius: 8px;
-  margin-top: 10px;
-  border-left: 5px solid #007bff;
-  text-transform: uppercase;
-}
-
-/* Efecto de aparición */
 @keyframes fadeIn {
   0% {
     opacity: 0;
@@ -241,13 +221,38 @@ body {
     transform: translateY(0);
   }
 }
+
+.result-message.success {
+  color: var(--green);
+  font-size: 1.8rem;
+  margin-bottom: 10px;
+  font-weight: bold;
+}
+
+.result-message.fail {
+  color: var(--red);
+  font-size: 1.8rem;
+  margin-bottom: 10px;
+  font-weight: bold;
+}
+
+.answer-message {
+  color: #555;
+  font-size: 1.5rem;
+  background-color: #f1f1f1;
+  padding: 10px;
+  border-radius: 8px;
+  margin-top: 10px;
+  border-left: 5px solid var(--primary-color);
+  text-transform: uppercase;
+}
+
 #answer {
   font-size: 1.5rem;
 }
 
-/* Increase riddle font size (if not set inline) */
 #riddle {
-  background-color: #d7faff; /* Un color de fondo suave (AliceBlue) */
+  background-color: #d7faff;
   font-size: 1.6rem;
   font-weight: bold;
   padding: 15px;
@@ -267,24 +272,18 @@ body {
   margin-bottom: 20px;
 }
 
-.card {
-  background-color: #fff;
-  border-radius: 10px;
-  padding: 20px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-}
-#user-answer {
-  width: 100%;
-  padding: 10px;
-  font-size: 1rem;
-  margin-top: 10px;
-  text-transform: uppercase;
-}
+/* =======================================
+   Forms & Buttons
+========================================== */
+#user-answer,
 #username-input {
   width: 100%;
   padding: 10px;
   font-size: 1rem;
   margin-top: 10px;
+}
+
+#username-input {
   text-transform: none !important;
 }
 
@@ -292,52 +291,48 @@ button {
   padding: 10px 20px;
   font-size: 1rem;
   margin-top: 10px;
-  background-color: #007bff;
+  background-color: var(--primary-color);
   color: #fff;
   border: none;
   border-radius: 5px;
   cursor: pointer;
+  transition: all 0.3s ease;
 }
 
-/* Estilo para los botones desactivados */
 button:disabled {
   background-color: #ddd;
   color: #999;
   cursor: not-allowed;
   border: 1px solid #ccc;
   opacity: 0.7;
-  transition: all 0.3s ease;
 }
 
-/* Suaviza la transición de los botones */
-button {
-  transition: all 0.3s ease;
-}
-
-/* Opcional: Efecto de "botón apagado" */
 button:disabled:hover {
-  transform: none; /* Evita el efecto hover */
+  transform: none;
   box-shadow: none;
 }
 
-/* Calendar Styling */
+/* =======================================
+   Calendar Styles
+========================================== */
 #calendar {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
   gap: 5px;
   margin-top: 10px;
 }
+
 .calendar-card {
-  justify-content: center;
-  align-items: center;
   display: flex;
   flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 
 .calendar-day {
   padding: 10px;
   text-align: center;
-  border: 1px solid #ccc;
+  border: 1px solid var(--border-color);
   border-radius: 5px;
   font-size: 0.9rem;
   color: #fff;
@@ -350,15 +345,9 @@ button:disabled:hover {
 .unsolved {
   background-color: rgb(219, 61, 61);
 }
-/* Para el día actual sin resolver, usa otro color, por ejemplo, amarillo */
-.today-unsolved {
-  background-color: #f2d359; /* amarillo */
-}
 
-.letter-input.solved-letter {
-  background-color: #d4edda; /* Fondo verde claro */
-  border: 2px solid #28a745; /* Borde verde */
-  color: #155724;
+.today-unsolved {
+  background-color: var(--yellow);
 }
 
 .future {
@@ -366,211 +355,9 @@ button:disabled:hover {
   color: #333;
 }
 
-/* Leaderboard Styling */
-#leaderboard {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-#leaderboard li {
-  font-size: 1rem;
-  padding: 5px 0;
-  border-bottom: 1px solid #eee;
-}
-
-/* Popup Overlay Styling */
-.popup-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.6);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-}
-
-.popup-content {
-  background-color: #fff;
-  padding: 30px;
-  border-radius: 15px;
-  max-width: 400px;
-  width: 90%;
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-  text-align: center;
-  position: relative;
-  animation: popup-appear 0.3s ease;
-}
-/* Título del popup */
-.popup-title {
-  font-size: 1.8rem;
-  color: #333;
-  margin-bottom: 10px;
-  font-weight: bold;
-}
-
-/* Mensaje del popup */
-.popup-message {
-  font-size: 1.2rem;
-  color: #555;
-  margin-bottom: 20px;
-  line-height: 1.4;
-}
-
-/* Botones del popup */
-.popup-buttons {
-  display: flex;
-  justify-content: space-around;
-  margin-top: 20px;
-}
-
-.popup-btn {
-  padding: 10px 20px;
-  border: none;
-  border-radius: 8px;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: transform 0.2s, box-shadow 0.2s;
-}
-
-.popup-btn.confirm {
-  background-color: #007bff;
-  color: white;
-}
-
-.popup-btn.cancel {
-  background-color: #ddd;
-  color: #333;
-}
-
-/* Efecto de hover */
-.popup-btn:hover {
-  transform: scale(1.05);
-  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
-}
-
-/* Efecto de animación */
-@keyframes popup-appear {
-  0% {
-    transform: scale(0.7);
-    opacity: 0;
-  }
-  100% {
-    transform: scale(1);
-    opacity: 1;
-  }
-}
-
-/* Result message styling */
-#result {
-  font-size: 1.2rem;
-  margin-top: 10px;
-}
-
-/* Responsive Styles */
-@media (max-width: 768px) {
-  /* Stack the cards vertically */
-  .cards-container {
-    flex-direction: column;
-    align-items: center;
-    padding: 10px;
-  }
-
-  /* Make both columns full width */
-  .left-column,
-  .right-column {
-    flex: 1 1 100%;
-    width: 100%;
-  }
-
-  /* Adjust header to stack vertically */
-  #main-header {
-    flex-direction: column;
-    align-items: center;
-  }
-
-  #header-right {
-    margin-top: 10px;
-    justify-content: center;
-  }
-}
-
-@media (max-width: 480px) {
-  /* Adjust container padding on small screens */
-  .container {
-    padding: 10px;
-  }
-
-  /* Adjust header font sizes */
-  #header-center h1 {
-    font-size: 2rem;
-  }
-
-  #header-center p {
-    font-size: 1.5rem;
-  }
-
-  /* Reduce padding in cards */
-  .card {
-    padding: 10px;
-    padding-top: 20px;
-  }
-
-  /* Adjust input and button sizes */
-  input[type="text"] {
-    padding: 8px;
-    font-size: 0.9rem;
-  }
-
-  button {
-    padding: 8px 16px;
-    font-size: 0.9rem;
-  }
-
-  #leaderboard li {
-    font-size: 0.9rem;
-  }
-}
-
-.user-solution {
-  width: 100%;
-}
-
-.buttons-riddle {
-  justify-content: center;
-  display: flex;
-}
-#submit-answer {
-  background-color: #3db54d;
-}
-#show-answer {
-  background-color: #f44336;
-}
-.submit {
-  margin: 20px;
-  font-size: 20px;
-}
-
-#streak-count i {
-  color: #e6790c; /* CarolCoins en dorado */
-  font-size: 1.7rem;
-}
-#carolCoins i {
-  color: #ffd700; /* CarolCoins en dorado */
-  font-size: 1.7rem;
-}
-.points-card {
-  justify-content: center;
-  align-items: center;
-  display: flex;
-  flex-direction: column;
-}
-
-/* LEADERBOARD */
-/* Estilos para la sección del leaderboard */
+/* =======================================
+   Leaderboard Styles
+========================================== */
 #leaderboard {
   list-style: none;
   padding: 0;
@@ -596,40 +383,47 @@ button:disabled:hover {
   border-bottom: none;
 }
 
-/* Color de fondo al pasar el mouse */
 #leaderboard li:hover {
   background-color: #f7f7f7;
 }
 
-/* Estilo para el nombre del usuario y la racha */
 .leaderboard-user {
   font-weight: 600;
-  color: #333;
+  color: var(--text-color);
 }
 
 .leaderboard-streak {
   font-size: 1.2rem;
-  color: #e6790c; /* Por ejemplo, un color dorado para resaltar la racha */
+  color: #e6790c;
 }
 
-/* Estilos inputs separados */
+/* =======================================
+   Letter Inputs & Keyboard
+========================================== */
 #letter-inputs {
-  text-align: center; /* Para centrar todos los inputs */
+  text-align: center;
   margin-top: 10px;
 }
+
 .letter-input {
-  width: 45px; /* Ancho fijo */
-  height: 45px; /* Alto fijo */
+  width: 50px;
+  height: 50px;
   font-size: 1.8rem !important;
   text-align: center;
-  margin: 0 3px; /* Espacio entre cuadros */
-  border: 1px solid #ccc;
+  margin: 0 3px;
+  border: 1px solid var(--border-color);
   border-radius: 4px;
-  display: inline-block; /* Alineación horizontal */
+  display: inline-block;
   text-transform: uppercase;
+  padding: 0px !important;
 }
 
-/* Estilos para el keyboard */
+.letter-input.solved-letter {
+  background-color: #d4edda;
+  border: 2px solid var(--green);
+  color: #155724;
+}
+
 #custom-keyboard {
   display: flex;
   flex-direction: column;
@@ -661,10 +455,191 @@ button:disabled:hover {
   background-color: #555;
 }
 
+/* =======================================
+   Miscellaneous
+========================================== */
 .day-title {
   text-align: center;
   font-size: 1.2rem;
   font-weight: bold;
   color: #2c2c2c;
   margin: 20px 0;
+}
+
+/* =======================================
+   Popup Styles
+========================================== */
+.popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.popup-content {
+  background-color: #fff;
+  padding: 30px;
+  border-radius: 15px;
+  max-width: 400px;
+  width: 90%;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+  text-align: center;
+  position: relative;
+  animation: popup-appear 0.3s ease;
+}
+
+@keyframes popup-appear {
+  0% {
+    transform: scale(0.7);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.popup-title {
+  font-size: 1.8rem;
+  color: var(--text-color);
+  margin-bottom: 10px;
+  font-weight: bold;
+}
+
+.popup-message {
+  font-size: 1.2rem;
+  color: #555;
+  margin-bottom: 20px;
+  line-height: 1.4;
+}
+
+.popup-buttons {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 20px;
+}
+
+.popup-btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.popup-btn.confirm {
+  background-color: var(--primary-color);
+  color: #fff;
+}
+
+.popup-btn.cancel {
+  background-color: #ddd;
+  color: #333;
+}
+
+.popup-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* =======================================
+   Result Message
+========================================== */
+#result {
+  font-size: 1.2rem;
+  margin-top: 10px;
+}
+
+/* =======================================
+   Responsive Adjustments
+========================================== */
+@media (max-width: 768px) {
+  .cards-container {
+    flex-direction: column;
+    align-items: center;
+    padding: 10px;
+  }
+  .left-column,
+  .right-column {
+    flex: 1 1 100%;
+    width: 100%;
+  }
+  #main-header {
+    flex-direction: column;
+    align-items: center;
+  }
+  #header-right {
+    margin-top: 10px;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 10px;
+  }
+  #header-center h1 {
+    font-size: 2rem;
+  }
+  #header-center p {
+    font-size: 1.5rem;
+  }
+  .card {
+    padding: 10px 20px;
+  }
+  input[type="text"],
+  button {
+    padding: 8px 16px;
+    font-size: 0.9rem;
+  }
+  #leaderboard li {
+    font-size: 0.9rem;
+  }
+}
+
+/* Additional Classes */
+.user-solution {
+  width: 100%;
+}
+
+.buttons-riddle {
+  display: flex;
+  justify-content: center;
+}
+
+#submit-answer {
+  background-color: #3db54d;
+}
+
+#show-answer {
+  background-color: #f44336;
+}
+
+.submit {
+  margin: 20px;
+  font-size: 20px;
+}
+
+#streak-count i {
+  color: #e6790c;
+  font-size: 1.7rem;
+}
+
+#carolCoins i {
+  color: var(--gold);
+  font-size: 1.7rem;
+}
+
+.points-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
