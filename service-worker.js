@@ -9,6 +9,7 @@ const FILES_TO_CACHE = [
   "/manifest.json",
   "/icon-192x192.png",
   "/icon-512x512.png",
+  "/icon-apple.png",
 ];
 
 self.addEventListener("install", (event) => {

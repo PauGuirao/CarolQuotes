@@ -8,7 +8,7 @@
     <!-- Opcional: estilo de la barra de estado -->
     <meta name="apple-mobile-web-app-status-bar-style" content="black" />
     <!-- Ícono para el home screen en iOS -->
-    <link rel="apple-touch-icon" href="icon-192x192.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/icon-apple.png" />
 
     <title>ACERTIJAZO</title>
     <link rel="stylesheet" href="styles.css" />
@@ -68,25 +68,35 @@
       <!-- Game Container (hidden until user logs in) -->
       <div id="game-container" class="" style="display: none">
         <!-- Header Section: Title and Timer Centered; User Info at Top Right -->
-        <div id="day-title" class="day-title"></div>
+        <div class="header-container">
+          <span id="streak-count" class="points-top" style="margin-right: 10px">
+            <i class="fas fa-fire"></i> <span id="streak-value">0</span>
+          </span>
+          <div id="day-title" class="day-title"></div>
+          <span id="carolCoins" class="points-top">
+            <i class="fas fa-coins"></i> <span id="coins-value">0</span>
+          </span>
+        </div>
         <!-- Cards Container -->
         <div class="cards-container">
           <!-- Left Column: Riddle Card (without title/timer) -->
           <div class="left-column">
             <div class="card answer-card" id="answer-card">
-              <p id="timer"></p>
               <p id="result" class="result-message"></p>
               <p id="answer" class="answer-message"></p>
             </div>
             <div class="card riddle-card">
               <p id="riddle"></p>
+              <p id="timer"></p>
               <div class="user-solution">
                 <div id="letter-inputs"></div>
                 <!-- Contenedor para el teclado custom -->
                 <div id="custom-keyboard"></div>
                 <div class="buttons-riddle">
                   <button id="submit-answer" class="submit">Soluciona</button>
-                  <button id="show-answer" class="submit">Rendirse</button>
+                  <button id="show-answer" class="submit" style="display: none">
+                    Rendirse
+                  </button>
                 </div>
               </div>
               <!-- Popup Modal -->
@@ -112,23 +122,12 @@
 
           <!-- Right Column: Calendar & Leaderboard Cards -->
           <div class="right-column">
-            <div class="card points-card">
-              <h3>Tus puntos</h3>
-              <div>
-                <span id="streak-count" style="margin-right: 10px">
-                  <i class="fas fa-fire"></i> <span id="streak-value">0</span>
-                </span>
-                <span id="carolCoins">
-                  <i class="fas fa-coins"></i> <span id="coins-value">0</span>
-                </span>
-              </div>
-            </div>
             <div class="card calendar-card">
               <h3>Tus Acetijazos</h3>
               <div id="calendar-controls">
-                <button id="prev-month">Prev</button>
+                <button id="prev-month">Anterior</button>
                 <span id="calendar-label"></span>
-                <button id="next-month">Next</button>
+                <button id="next-month">Siguiente</button>
               </div>
               <div id="calendar"></div>
             </div>

@@ -161,7 +161,16 @@ document.addEventListener("DOMContentLoaded", async () => {
         const username = doc.id;
         const streak = data.streak || 0;
         const li = document.createElement("li");
-        li.innerText = `${username}: ${streak}`;
+
+        // Crea la estructura interna del ítem:
+        li.innerHTML = `
+          <div class="leaderboard-item">
+            <img class="profile-photo" src="profile-1.png" alt="Foto de perfil">
+            <span class="username">${username}</span>
+            <span class="points">${streak}</span>
+          </div>
+        `;
+
         leaderboardEl.appendChild(li);
       });
       localStorage.setItem("leaderboardCache", leaderboardEl.innerHTML);
@@ -256,7 +265,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const keyboardRows = [
       ["Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P"],
       ["A", "S", "D", "F", "G", "H", "J", "K", "L", "Ñ"],
-      ["✔", "Z", "X", "C", "V", "B", "N", "M", "⌫"],
+      ["Z", "X", "C", "V", "B", "N", "M", "⌫"],
     ];
     keyboardRows.forEach((row) => {
       const rowDiv = document.createElement("div");
@@ -266,6 +275,9 @@ document.addEventListener("DOMContentLoaded", async () => {
         button.classList.add("keyboard-key");
         button.innerText = key;
         button.dataset.key = key;
+        if (key === "⌫") {
+          button.classList.add("backspace-key");
+        }
         rowDiv.appendChild(button);
       });
       container.appendChild(rowDiv);
@@ -359,12 +371,12 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   function updateUserInfo(userData) {
-    streakCountElement.innerHTML = `RACHA: ${
+    streakCountElement.innerHTML = `<i class="fas fa-fire"></i>${
       userData.streak || 0
-    } <i class="fas fa-fire"></i>`;
-    carolCoinsElement.innerHTML = `CAROLOS: ${
+    }`;
+    carolCoinsElement.innerHTML = `<i class="fas fa-coins"></i>${
       userData.carolCoins || 0
-    } <i class="fas fa-coins"></i>`;
+    }`;
   }
 
   function updateDayTitle() {
@@ -449,6 +461,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         resultElement.className = "result-message fail";
         resultElement.innerText = "Respuesta incorrecta. Inténtalo de nuevo!";
         clearLetterInputs();
+        handleWrongAnswer();
       }
       resultElement.style.display = "block";
       answerElement.style.display = "block";
@@ -535,6 +548,27 @@ document.addEventListener("DOMContentLoaded", async () => {
     const successMessage = document.getElementById("success-message");
     successMessage.innerText = `¡Felicidades, has acertado! Has ganado +10 CarolCoins. La respuesta correcta es: ${riddle.answer}`;
     successPopup.style.display = "flex";
+  }
+
+  function handleWrongAnswer() {
+    const letterInputs = document.querySelectorAll(".letter-input");
+
+    // Añadir animación de sacudida y borde rojo
+    letterInputs.forEach((input) => {
+      input.classList.add("shake");
+    });
+
+    // Activar la vibración del dispositivo
+    if ("vibrate" in navigator) {
+      navigator.vibrate([100, 50, 100]); // Vibra con un pequeño patrón
+    }
+
+    // Eliminar la clase de sacudida después de la animación
+    setTimeout(() => {
+      letterInputs.forEach((input) => {
+        input.classList.remove("shake");
+      });
+    }, 500);
   }
 
   async function handleShowAnswer(riddle, userData) {
