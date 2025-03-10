@@ -454,17 +454,15 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   function selectDailyRiddle(riddles) {
     const now = new Date();
-    // Define an "effective date" that determines which riddle to use.
-    // If the current time is before 19:00, use yesterday's date.
     let effectiveDate = new Date(now);
-    if (now.getHours() < 19) {
-      effectiveDate.setDate(effectiveDate.getDate() - 1);
+    // If it's 19:00 or later, use tomorrow's date
+    if (now.getHours() >= 19) {
+      effectiveDate.setDate(effectiveDate.getDate() + 1);
     }
-    // Calculate the day-of-year based on the effective date.
+    // Otherwise, keep today's date (even if it's before 19:00)
     const startOfYear = new Date(effectiveDate.getFullYear(), 0, 0);
     const oneDay = 1000 * 60 * 60 * 24;
     const dayOfYear = Math.floor((effectiveDate - startOfYear) / oneDay);
-    // Cycle through the riddles array based on the dayOfYear
     return riddles[dayOfYear % riddles.length];
   }
 
