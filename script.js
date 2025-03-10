@@ -27,10 +27,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     appId: "1:251432655094:web:5f20dd75c907500709b4d7",
     measurementId: "G-5JNTDYBL7B",
   };
+  firebase.initializeApp(firebaseConfig);
 
   Notification.requestPermission().then((permission) => {
     if (permission === "granted") {
-      firebase.initializeApp(firebaseConfig);
       const messaging = firebase.messaging();
 
       messaging
