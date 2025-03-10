@@ -453,13 +453,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   function selectDailyRiddle(riddles) {
-    const now = new Date();
-    let effectiveDate = new Date(now);
-    // If it's 19:00 or later, use tomorrow's date
-    if (now.getHours() >= 19) {
-      effectiveDate.setDate(effectiveDate.getDate() + 1);
-    }
-    // Otherwise, keep today's date (even if it's before 19:00)
+    const effectiveDate = getEffectiveDate();
     const startOfYear = new Date(effectiveDate.getFullYear(), 0, 0);
     const oneDay = 1000 * 60 * 60 * 24;
     const dayOfYear = Math.floor((effectiveDate - startOfYear) / oneDay);
@@ -475,13 +469,23 @@ document.addEventListener("DOMContentLoaded", async () => {
     checkIfRiddleSolved(riddle, userData);
   }
 
+  function getEffectiveDate() {
+    const now = new Date();
+    let effectiveDate = new Date(now);
+    // If it's 19:00 or later, use tomorrow's date; otherwise, use today's date.
+    if (now.getHours() >= 19) {
+      effectiveDate.setDate(effectiveDate.getDate() + 1);
+    }
+    return effectiveDate;
+  }
+
   function checkIfRiddleSolved(riddle, userData) {
-    const today = new Date();
-    const startOfYear = new Date(today.getFullYear(), 0, 0);
+    const effectiveDate = getEffectiveDate();
+    const startOfYear = new Date(effectiveDate.getFullYear(), 0, 0);
     const oneDay = 1000 * 60 * 60 * 24;
-    const dayOfYear = Math.floor((today - startOfYear) / oneDay);
+    const dayOfYear = Math.floor((effectiveDate - startOfYear) / oneDay);
     const solvedKey = getStorageKey(
-      `riddleSolved_${today.getFullYear()}_${dayOfYear}`
+      `riddleSolved_${effectiveDate.getFullYear()}_${dayOfYear}`
     );
     if (userData.solved && userData.solved[solvedKey]) {
       // Update UI to reflect that today's riddle is solved.
