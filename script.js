@@ -583,7 +583,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const oneDay = 1000 * 60 * 60 * 24;
     const dayOfYear = Math.floor((today - startOfYear) / oneDay);
     const solvedKey = getStorageKey(
-      `riddleSolved_${today.getFullYear()}_${dayOfYear}`
+      `riddleSolved_${today.getFullYear()}_${dayOfYear + 1}`
     );
     userData.solved = userData.solved || {};
     userData.solved[solvedKey] = true;
