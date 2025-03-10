@@ -1,14 +1,17 @@
 // ===============================
 // Service Worker Registration
 // ===============================
+/*
 if ("serviceWorker" in navigator) {
   navigator.serviceWorker
-    .register("/service-worker.js")
+    .register("/firebase-messaging-sw.js")
     .then((reg) => console.log("Service Worker registered:", reg))
     .catch((err) =>
       console.error("Error registering the Service Worker:", err)
     );
 }
+
+*/
 
 // ===============================
 // DOMContentLoaded: App Initialization
@@ -27,6 +30,37 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   // Initialize Firebase
   firebase.initializeApp(firebaseConfig);
+
+  const messaging = firebase.messaging();
+  navigator.serviceWorker
+    .register("/firebase-messaging-sw.js")
+    .then((registration) => {
+      console.log("Service Worker registered with scope:", registration.scope);
+      return navigator.serviceWorker.ready;
+    })
+    .then((registration) => {
+      // Request notification permission
+      return Notification.requestPermission().then((permission) => {
+        if (permission === "granted") {
+          return messaging.getToken({
+            serviceWorkerRegistration: registration,
+            vapidKey:
+              "BOlRfGopi3Yk3RaCk1stJQbx-UbO8np-5NEwJ0iGwTrAO7E4uqteVoER_oGuii7V8R5lxr9Ti4qWPHrQIspv8Y0", // Replace with your actual VAPID key
+          });
+        } else {
+          console.warn("Notification permission not granted.");
+        }
+      });
+    })
+    .then((token) => {
+      if (token) {
+        console.log("FCM Token:", token);
+        // Optionally save the token to Firestore or use it for push notifications
+      }
+    })
+    .catch((error) => {
+      console.error("Error getting FCM token:", error);
+    });
   const db = firebase.firestore();
 
   // Enable offline persistence
