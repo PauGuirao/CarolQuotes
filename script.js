@@ -49,7 +49,7 @@ document.addEventListener("DOMContentLoaded", async () => {
           }
         });
     } else {
-      console.warn("Notification permission not granted.");
+      console.warn("Notification permission not granted");
     }
   });
   const db = firebase.firestore();
