@@ -29,29 +29,69 @@ document.addEventListener("DOMContentLoaded", async () => {
   };
   firebase.initializeApp(firebaseConfig);
 
-  Notification.requestPermission().then((permission) => {
-    if (permission === "granted") {
-      const messaging = firebase.messaging();
-
-      messaging
-        .getToken({
-          messaging,
-          vapidKey:
-            "BOlRfGopi3Yk3RaCk1stJQbx-UbO8np-5NEwJ0iGwTrAO7E4uqteVoER_oGuii7V8R5lxr9Ti4qWPHrQIspv8Y0", // Replace with your actual VAPID key
-        })
-        .then((currentToken) => {
-          if (currentToken) {
-            console.log("Token:", currentToken);
-          } else {
-            console.warn(
-              "No registration token available. Request permission."
-            );
-          }
-        });
-    } else {
-      console.warn("Notification permission not granted");
+  // Register the service worker
+  let registration;
+  if ("serviceWorker" in navigator) {
+    try {
+      registration = await navigator.serviceWorker.register(
+        "/firebase-messaging-sw.js"
+      );
+      console.log("Service Worker registered:", registration);
+    } catch (error) {
+      console.error("Error registering service worker:", error);
     }
-  });
+  }
+
+  const messaging = firebase.messaging();
+  document
+    .getElementById("enableNotifications")
+    .addEventListener("click", () => {
+      // Request permission for notifications
+      Notification.requestPermission()
+        .then((permission) => {
+          if (permission === "granted") {
+            console.log("Notification permission granted.");
+            return messaging.getToken({
+              serviceWorkerRegistration: registration,
+              vapidKey:
+                "BOlRfGopi3Yk3RaCk1stJQbx-UbO8np-5NEwJ0iGwTrAO7E4uqteVoER_oGuii7V8R5lxr9Ti4qWPHrQIspv8Y0", // Replace with your actual VAPID key
+            });
+          } else {
+            console.warn("Notification permission denied.");
+          }
+        })
+        .then((token) => {
+          if (token) {
+            console.log("FCM Token received:", token);
+            saveTokenToFirestore(token);
+          }
+        })
+        .catch((error) => {
+          console.error("Error getting FCM token:", error);
+        });
+    });
+
+  function saveTokenToFirestore(token) {
+    // Assume currentUser holds the current user's ID (e.g., "pau")
+    const userId = "pau";
+    firebase
+      .firestore()
+      .collection("users")
+      .doc(userId)
+      .set(
+        {
+          fcmToken: token,
+        },
+        { merge: true }
+      )
+      .then(() => {
+        console.log("Token saved to Firestore successfully.");
+      })
+      .catch((error) => {
+        console.error("Error saving token to Firestore:", error);
+      });
+  }
+
   const db = firebase.firestore();
 
   // Enable offline persistence
