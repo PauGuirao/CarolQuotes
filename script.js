@@ -447,16 +447,24 @@ document.addEventListener("DOMContentLoaded", async () => {
   function updateDayTitle() {
     const dayTitle = document.getElementById("day-title");
     const today = new Date();
-    const options = { year: "numeric", month: "long", day: "numeric" };
+    const options = { month: "long", day: "numeric" };
     dayTitle.innerText = today.toLocaleDateString("es-ES", options);
     dayTitle.style.display = "block";
   }
 
   function selectDailyRiddle(riddles) {
-    const today = new Date();
-    const startOfYear = new Date(today.getFullYear(), 0, 0);
+    const now = new Date();
+    // Define an "effective date" that determines which riddle to use.
+    // If the current time is before 19:00, use yesterday's date.
+    let effectiveDate = new Date(now);
+    if (now.getHours() < 19) {
+      effectiveDate.setDate(effectiveDate.getDate() - 1);
+    }
+    // Calculate the day-of-year based on the effective date.
+    const startOfYear = new Date(effectiveDate.getFullYear(), 0, 0);
     const oneDay = 1000 * 60 * 60 * 24;
-    const dayOfYear = Math.floor((today - startOfYear) / oneDay);
+    const dayOfYear = Math.floor((effectiveDate - startOfYear) / oneDay);
+    // Cycle through the riddles array based on the dayOfYear
     return riddles[dayOfYear % riddles.length];
   }
 
@@ -793,12 +801,27 @@ document.addEventListener("DOMContentLoaded", async () => {
   // ===============================
   function updateTimer() {
     const now = new Date();
-    const tomorrow = new Date(
+    // Set target to today at 19:00
+    let target = new Date(
       now.getFullYear(),
       now.getMonth(),
-      now.getDate() + 1
+      now.getDate(),
+      19,
+      0,
+      0
     );
-    const diffMs = tomorrow - now;
+    // If current time is equal to or after 19:00, set target to tomorrow at 19:00
+    if (now >= target) {
+      target = new Date(
+        now.getFullYear(),
+        now.getMonth(),
+        now.getDate() + 1,
+        19,
+        0,
+        0
+      );
+    }
+    const diffMs = target - now;
     const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
     const diffMinutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
     const diffSeconds = Math.floor((diffMs % (1000 * 60)) / 1000);

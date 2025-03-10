@@ -106,6 +106,34 @@ body {
   display: block;
 }
 
+#enableNotifications {
+  background: none;
+  border: none;
+  color: var(--dark-text);
+  font-size: 1.1rem;
+  padding: 5px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  margin-top: 0px;
+}
+
+/* Hover effect similar to nav links */
+#enableNotifications:hover {
+  background-color: var(--nav-hover);
+}
+
+/* Optionally, adjust the bell icon size */
+#enableNotifications i {
+  font-size: 1.2rem;
+}
+#enableNotifications:focus,
+#enableNotifications:active {
+  outline: none;
+  background-color: transparent;
+  -webkit-tap-highlight-color: transparent;
+}
+
 /* Responsive Navigation */
 @media (max-width: 600px) {
   .navbar-title {

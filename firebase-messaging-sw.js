@@ -22,13 +22,15 @@ const messaging = firebase.messaging();
 // Handle background messages for push notifications
 messaging.onBackgroundMessage(function (payload) {
   console.log("[service-worker.js] Received background message ", payload);
+  const test = payload.data;
+  console.log(test);
   const notificationTitle = payload.notification?.title || "Background Message";
   const notificationOptions = {
     body: payload.notification?.body || "You have received a new message.",
     icon: "/icon-192x192.png",
   };
 
-  self.registration.showNotification(notificationTitle, notificationOptions);
+  //self.registration.showNotification(notificationTitle, notificationOptions);
 });
 
 // -------------------------
