@@ -28,9 +28,30 @@ document.addEventListener("DOMContentLoaded", async () => {
     measurementId: "G-5JNTDYBL7B",
   };
 
-  // Initialize Firebase
-  firebase.initializeApp(firebaseConfig);
-  const messaging = firebase.messaging();
+  Notification.requestPermission().then((permission) => {
+    if (permission === "granted") {
+      firebase.initializeApp(firebaseConfig);
+      const messaging = firebase.messaging();
+
+      messaging
+        .getToken({
+          messaging,
+          vapidKey:
+            "BOlRfGopi3Yk3RaCk1stJQbx-UbO8np-5NEwJ0iGwTrAO7E4uqteVoER_oGuii7V8R5lxr9Ti4qWPHrQIspv8Y0", // Replace with your actual VAPID key
+        })
+        .then((currentToken) => {
+          if (currentToken) {
+            console.log("Token:", currentToken);
+          } else {
+            console.warn(
+              "No registration token available. Request permission."
+            );
+          }
+        });
+    } else {
+      console.warn("Notification permission not granted.");
+    }
+  });
   const db = firebase.firestore();
 
   // Enable offline persistence
